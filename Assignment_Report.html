@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NeuraFlow – AI Task Management Portal | Assignment Document</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #fff;
+    color: #1e293b;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  /* Cover Page */
+  .cover {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #07111F 0%, #0B1220 50%, #111827 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    page-break-after: always;
+    padding: 60px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
+    top: -100px; left: -100px;
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%);
+    bottom: -80px; right: -80px;
+  }
+
+  .logo-svg { margin-bottom: 32px; }
+
+  .cover-badge {
+    display: inline-block;
+    background: rgba(59,130,246,0.15);
+    border: 1px solid rgba(59,130,246,0.3);
+    color: #60a5fa;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 6px 20px;
+    border-radius: 50px;
+    margin-bottom: 24px;
+  }
+  .cover h1 {
+    font-size: 52px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+    line-height: 1.1;
+  }
+  .cover-sub {
+    font-size: 18px;
+    color: #64748b;
+    margin-bottom: 8px;
+    font-weight: 400;
+  }
+  .cover-tagline {
+    font-size: 14px;
+    color: #475569;
+    font-style: italic;
+    margin-bottom: 48px;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .cover-meta-item { text-align: center; }
+  .cover-meta-item .label {
+    font-size: 10px;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+  .cover-meta-item .value {
+    font-size: 14px;
+    color: #e2e8f0;
+    font-weight: 600;
+  }
+  .cover-divider {
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    margin: 40px auto;
+    border-radius: 2px;
+  }
+
+  /* Content pages */
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 50px 60px;
+  }
+
+  @media print {
+    .cover { min-height: 100vh; }
+    .section { page-break-inside: avoid; }
+    .page-break { page-break-before: always; }
+  }
+
+  /* Section */
+  .section { margin-bottom: 48px; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  .section-num {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+  }
+  .section-icon { font-size: 22px; }
+
+  h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 24px 0 10px;
+  }
+  p { color: #475569; margin-bottom: 12px; }
+  ul { padding-left: 20px; margin-bottom: 12px; }
+  li { color: #475569; margin-bottom: 4px; }
+  strong { color: #1e293b; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 12px;
+  }
+  thead tr { background: linear-gradient(135deg, #f1f5f9, #e2e8f0); }
+  th {
+    text-align: left;
+    padding: 10px 14px;
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #cbd5e1;
+  }
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #475569;
+    vertical-align: top;
+  }
+  tr:hover td { background: #f8fafc; }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .badge-blue { background: #dbeafe; color: #1d4ed8; }
+  .badge-purple { background: #ede9fe; color: #6d28d9; }
+  .badge-green { background: #dcfce7; color: #15803d; }
+  .badge-orange { background: #ffedd5; color: #c2410c; }
+
+  /* Code blocks */
+  code {
+    font-family: 'Fira Code', monospace;
+    background: #f1f5f9;
+    color: #3b82f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+  }
+  pre {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 20px 24px;
+    border-radius: 12px;
+    overflow-x: auto;
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
+    line-height: 1.8;
+    margin-bottom: 16px;
+    border-left: 4px solid #3b82f6;
+  }
+  pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+
+  /* Architecture diagram */
+  .arch-box {
+    background: #0f172a;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+    border: 1px solid #1e293b;
+  }
+  .arch-box pre { background: none; border: none; padding: 0; margin: 0; }
+
+  /* ER Diagram visual */
+  .er-diagram {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .er-entity {
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .er-entity-header {
+    padding: 10px 16px;
+    font-weight: 700;
+    font-size: 13px;
+    color: #fff;
+    letter-spacing: 0.5px;
+  }
+  .er-entity-header.users { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+  .er-entity-header.tasks { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+  .er-entity-header.comments { background: linear-gradient(135deg, #10b981, #059669); }
+
+  .er-fields { padding: 8px 0; }
+  .er-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 16px;
+    font-size: 11.5px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .er-field:last-child { border-bottom: none; }
+  .er-field-name { font-weight: 600; color: #1e293b; min-width: 130px; }
+  .er-field-type { color: #64748b; font-family: 'Fira Code', monospace; font-size: 10.5px; }
+  .er-field-constraint { margin-left: auto; }
+
+  .pk { background: #fef3c7; color: #92400e; }
+  .fk { background: #dbeafe; color: #1d4ed8; }
+  .nn { background: #f0fdf4; color: #15803d; }
+  .uq { background: #fdf4ff; color: #7e22ce; }
+
+  .er-relations {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .er-relation {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 12px;
+  }
+  .er-relation-arrow { font-size: 18px; color: #94a3b8; }
+  .er-relation-type {
+    padding: 2px 8px;
+    background: #ede9fe;
+    color: #6d28d9;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  /* AI Workflow */
+  .workflow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .workflow-step-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .workflow-step-content strong { color: #1e293b; display: block; margin-bottom: 2px; }
+  .workflow-step-content p { margin: 0; font-size: 12px; }
+  .workflow-arrow {
+    width: 2px;
+    height: 16px;
+    background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+    margin-left: 13px;
+    margin-bottom: 0;
+    border-radius: 1px;
+  }
+  .fallback-box {
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-top: 16px;
+  }
+  .fallback-box strong { color: #c2410c; }
+  .fallback-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .fallback-item {
+    background: #fff;
+    border: 1px solid #fed7aa;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 11.5px;
+  }
+  .fallback-item .kw { font-family: 'Fira Code', monospace; color: #c2410c; font-size: 11px; }
+  .fallback-item .res { color: #475569; }
+
+  /* Feature grid */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .feature-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .feature-card-icon { font-size: 20px; margin-bottom: 6px; }
+  .feature-card-title { font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+  .feature-card-desc { font-size: 11.5px; color: #64748b; }
+
+  /* Challenges */
+  .challenge-card {
+    background: #f8fafc;
+    border-left: 4px solid #3b82f6;
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .challenge-card .problem { font-weight: 700; color: #1e293b; font-size: 12.5px; margin-bottom: 4px; }
+  .challenge-card .solution { color: #475569; font-size: 12px; }
+  .challenge-card .solution code { font-size: 10.5px; }
+
+  /* Footer */
+  .footer {
+    background: #0f172a;
+    color: #64748b;
+    text-align: center;
+    padding: 40px 60px;
+    margin-top: 60px;
+    font-size: 12px;
+  }
+  .footer strong { color: #e2e8f0; }
+  .footer-links { margin-top: 12px; display: flex; gap: 24px; justify-content: center; }
+  .footer-links a { color: #3b82f6; text-decoration: none; font-size: 11.5px; }
+
+  /* Print button */
+  .print-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 28px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 30px rgba(59,130,246,0.4);
+    font-family: 'Inter', sans-serif;
+    transition: transform 0.2s;
+    z-index: 9999;
+  }
+  .print-btn:hover { transform: scale(1.05); }
+  @media print { .print-btn { display: none; } }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 0;
+  }
+  .toc-list li { margin: 0; }
+  .toc-list a {
+    display: flex; align-items: center; gap: 8px;
+    color: #3b82f6; text-decoration: none;
+    font-size: 13px; padding: 8px 12px;
+    background: #f8fafc; border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    font-weight: 500;
+  }
+  .toc-list a:hover { background: #eff6ff; }
+</style>
+</head>
+<body>
+
+<!-- ============================== COVER PAGE ============================== -->
+<div class="cover">
+  <div class="logo-svg">
+    <svg viewBox="0 0 100 100" width="80" height="80">
+      <defs>
+        <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#3B82F6"/>
+          <stop offset="50%" stop-color="#8B5CF6"/>
+          <stop offset="100%" stop-color="#EC4899"/>
+        </linearGradient>
+      </defs>
+      <path d="M 5 50 C 30 10 70 10 95 50 C 70 90 30 90 5 50 Z M 35 50 A 15 15 0 1 1 65 50 A 15 15 0 1 1 35 50 M 50 35 L 50 5 M 50 65 L 50 95 M 35 50 L 5 50 M 65 50 L 95 50 M 39 39 L 15 15 M 61 39 L 85 15 M 39 61 L 15 85 M 61 61 L 85 85"
+        fill="transparent" stroke="url(#g1)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="5" cy="50" r="3.5" fill="#fff" opacity="0.9"/>
+      <circle cx="95" cy="50" r="3.5" fill="#fff" opacity="0.9"/>
+      <circle cx="50" cy="5" r="3.5" fill="#fff" opacity="0.9"/>
+      <circle cx="50" cy="95" r="3.5" fill="#fff" opacity="0.9"/>
+      <circle cx="15" cy="15" r="3.5" fill="#fff" opacity="0.9"/>
+      <circle cx="85" cy="15" r="3.5" fill="#fff" opacity="0.9"/>
+      <circle cx="15" cy="85" r="3.5" fill="#fff" opacity="0.9"/>
+      <circle cx="85" cy="85" r="3.5" fill="#fff" opacity="0.9"/>
+      <circle cx="50" cy="50" r="5" fill="#fff"/>
+    </svg>
+  </div>
+  <div class="cover-badge">Assignment Submission Report</div>
+  <h1>NeuraFlow</h1>
+  <div class="cover-sub">AI-Powered Task Management Portal</div>
+  <div class="cover-tagline">"Transforming Productivity with Intelligence"</div>
+  <div class="cover-divider"></div>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="label">Author</div>
+      <div class="value">Sakshi Ghanekar</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Stack</div>
+      <div class="value">React + Spring Boot + MySQL</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">AI Integration</div>
+      <div class="value">Google Gemini AI</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Date</div>
+      <div class="value">June 2026</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== CONTENT ============================== -->
+<div class="page">
+
+  <!-- Table of Contents -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">📋</div>
+      <div class="section-title">Table of Contents</div>
+    </div>
+    <ul class="toc-list">
+      <li><a href="#overview">🧠 Project Overview</a></li>
+      <li><a href="#features">✨ Features</a></li>
+      <li><a href="#stack">🛠️ Tech Stack</a></li>
+      <li><a href="#architecture">🏗️ Architecture</a></li>
+      <li><a href="#er">🗄️ ER Diagram</a></li>
+      <li><a href="#ai">🤖 AI Workflow</a></li>
+      <li><a href="#security">🔐 Security</a></li>
+      <li><a href="#assignment">📄 Assignment Document</a></li>
+    </ul>
+  </div>
+
+  <!-- 1. Overview -->
+  <div class="section" id="overview">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title">Project Overview</div>
+    </div>
+    <p>
+      The <strong>NeuraFlow AI Task Management Portal</strong> is a comprehensive, production-ready full-stack web application
+      designed to streamline personal and team productivity. It allows users to register securely, manage tasks via a
+      modern Kanban board, and utilize an integrated <strong>Google Gemini AI</strong> assistant to automatically generate
+      detailed descriptions, assign priorities, and estimate completion times — from just a plain-English task title.
+    </p>
+    <p>
+      The application features a premium onboarding experience with an animated splash screen, glassmorphism UI design,
+      real-time countdown timers, dark/light mode, and full mobile responsiveness.
+    </p>
+    <ul>
+      <li>Register &amp; log in securely with <strong>JWT authentication</strong></li>
+      <li>Manage tasks on a <strong>Kanban Board</strong> (To Do → In Progress → Done)</li>
+      <li>Use <strong>Google Gemini AI</strong> to auto-generate task metadata</li>
+      <li>Track task progress with <strong>real-time color-coded countdowns</strong></li>
+      <li>Visualize analytics on a beautiful <strong>Dashboard</strong></li>
+    </ul>
+  </div>
+
+  <!-- 2. Features -->
+  <div class="section" id="features">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div class="section-title">Features</div>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-card-icon">🔐</div>
+        <div class="feature-card-title">Secure Authentication</div>
+        <div class="feature-card-desc">JWT-based stateless login & registration with BCrypt password hashing</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">🤖</div>
+        <div class="feature-card-title">AI Auto-fill</div>
+        <div class="feature-card-desc">Gemini AI generates description, priority & time estimate from task title</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">📋</div>
+        <div class="feature-card-title">Kanban Board</div>
+        <div class="feature-card-desc">Drag-and-drop style columns: To Do → In Progress → Done</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">⏱️</div>
+        <div class="feature-card-title">Live Countdown</div>
+        <div class="feature-card-desc">Real-time countdown timers with dynamic color: green → orange → red</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">📊</div>
+        <div class="feature-card-title">Analytics Dashboard</div>
+        <div class="feature-card-desc">Task completion stats, priority breakdown, productivity charts</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">🌙</div>
+        <div class="feature-card-title">Dark / Light Mode</div>
+        <div class="feature-card-desc">Fully themed dark and light mode with smooth transitions</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">🎬</div>
+        <div class="feature-card-title">Splash + Onboarding</div>
+        <div class="feature-card-desc">Animated NeuraFlow splash screen with Welcome onboarding flow</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">💎</div>
+        <div class="feature-card-title">Premium UI</div>
+        <div class="feature-card-desc">Glassmorphism, gradient animations, micro-interactions, responsive</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Tech Stack -->
+  <div class="section" id="stack">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div class="section-title">Tech Stack</div>
+    </div>
+    <h3>Frontend</h3>
+    <table>
+      <thead><tr><th>Technology</th><th>Version</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><strong>React.js</strong></td><td><span class="badge badge-blue">18</span></td><td>Component-based UI framework, Context API for state</td></tr>
+        <tr><td><strong>Vite</strong></td><td><span class="badge badge-green">5</span></td><td>Ultra-fast build tool & dev server with HMR</td></tr>
+        <tr><td><strong>Tailwind CSS</strong></td><td><span class="badge badge-blue">3</span></td><td>Utility-first CSS framework for design system</td></tr>
+        <tr><td><strong>Framer Motion</strong></td><td><span class="badge badge-purple">11</span></td><td>Smooth animations, transitions & micro-interactions</td></tr>
+        <tr><td><strong>React Router DOM</strong></td><td><span class="badge badge-blue">6</span></td><td>Client-side routing with protected routes</td></tr>
+        <tr><td><strong>Axios</strong></td><td>—</td><td>HTTP client with JWT interceptors</td></tr>
+        <tr><td><strong>Lucide React</strong></td><td>—</td><td>Icon library (600+ SVG icons)</td></tr>
+      </tbody>
+    </table>
+    <h3>Backend</h3>
+    <table>
+      <thead><tr><th>Technology</th><th>Version</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Spring Boot</strong></td><td><span class="badge badge-orange">3</span></td><td>Java REST API framework with auto-configuration</td></tr>
+        <tr><td><strong>Spring Security + JWT</strong></td><td>—</td><td>Stateless authentication via Bearer tokens</td></tr>
+        <tr><td><strong>Spring Data JPA / Hibernate</strong></td><td>—</td><td>ORM for database interaction</td></tr>
+        <tr><td><strong>MySQL</strong></td><td><span class="badge badge-blue">8</span></td><td>Relational database for users &amp; tasks</td></tr>
+        <tr><td><strong>Google Gemini AI (REST)</strong></td><td>—</td><td>AI-powered task description &amp; priority generation</td></tr>
+        <tr><td><strong>Jackson ObjectMapper</strong></td><td>—</td><td>JSON serialization / deserialization</td></tr>
+        <tr><td><strong>Maven</strong></td><td>—</td><td>Dependency management &amp; build tool</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. Architecture -->
+  <div class="section page-break" id="architecture">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <div class="section-title">System Architecture</div>
+    </div>
+    <div class="arch-box">
+      <pre><code>┌─────────────────────────────────────────────────────────┐
+│                     CLIENT (React SPA)                   │
+│  ┌──────────┐  ┌──────────┐  ┌───────────┐  ┌────────┐ │
+│  │ AuthCtx  │  │ TaskCtx  │  │  Pages    │  │  UI    │ │
+│  └──────────┘  └──────────┘  └───────────┘  └────────┘ │
+│                   Axios (JWT Interceptors)               │
+└──────────────────────────┬──────────────────────────────┘
+                           │ HTTPS / REST
+┌──────────────────────────▼──────────────────────────────┐
+│                   BACKEND (Spring Boot)                  │
+│  ┌────────────┐  ┌────────────┐  ┌───────────────────┐  │
+│  │ Controller │→ │  Service   │→ │   Repository      │  │
+│  └────────────┘  └────────────┘  └─────────┬─────────┘  │
+│  ┌────────────┐  ┌────────────┐            │ JPA        │
+│  │ JWT Filter │  │  AiService │            │            │
+│  └────────────┘  └─────┬──────┘            │            │
+└────────────────────────┼───────────────────┼────────────┘
+                         │ REST              │ SQL
+             ┌───────────▼───┐      ┌────────▼────┐
+             │  Google Gemini │      │   MySQL DB  │
+             │     AI API     │      │             │
+             └───────────────┘      └─────────────┘</code></pre>
+    </div>
+    <p><strong>Layered Architecture:</strong></p>
+    <table>
+      <thead><tr><th>Layer</th><th>Responsibility</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Controller</strong></td><td>Receives HTTP requests, validates input, delegates to service</td></tr>
+        <tr><td><strong>Service</strong></td><td>Business logic, AI integration, data transformation</td></tr>
+        <tr><td><strong>Repository</strong></td><td>JPA/Hibernate queries — abstracts database interaction</td></tr>
+        <tr><td><strong>Entity</strong></td><td>JPA-mapped Java objects (User, Task)</td></tr>
+        <tr><td><strong>Security</strong></td><td>JWT filter validates every incoming request before reaching controllers</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. ER Diagram -->
+  <div class="section page-break" id="er">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <div class="section-title">ER Diagram</div>
+    </div>
+    <div class="er-diagram">
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+        <div class="er-entity">
+          <div class="er-entity-header users">👤 USERS</div>
+          <div class="er-fields">
+            <div class="er-field"><span class="er-field-name">id</span><span class="er-field-type">BIGINT</span><span class="er-field-constraint"><span class="badge pk">PK</span></span></div>
+            <div class="er-field"><span class="er-field-name">name</span><span class="er-field-type">VARCHAR(100)</span><span class="er-field-constraint"><span class="badge nn">NN</span></span></div>
+            <div class="er-field"><span class="er-field-name">email</span><span class="er-field-type">VARCHAR(255)</span><span class="er-field-constraint"><span class="badge uq">UQ</span></span></div>
+            <div class="er-field"><span class="er-field-name">password</span><span class="er-field-type">VARCHAR(255)</span><span class="er-field-constraint"><span class="badge nn">NN</span></span></div>
+            <div class="er-field"><span class="er-field-name">created_at</span><span class="er-field-type">TIMESTAMP</span></div>
+          </div>
+        </div>
+        <div class="er-entity">
+          <div class="er-entity-header tasks">📋 TASKS</div>
+          <div class="er-fields">
+            <div class="er-field"><span class="er-field-name">id</span><span class="er-field-type">BIGINT</span><span class="er-field-constraint"><span class="badge pk">PK</span></span></div>
+            <div class="er-field"><span class="er-field-name">title</span><span class="er-field-type">VARCHAR(255)</span><span class="er-field-constraint"><span class="badge nn">NN</span></span></div>
+            <div class="er-field"><span class="er-field-name">description</span><span class="er-field-type">TEXT</span></div>
+            <div class="er-field"><span class="er-field-name">priority</span><span class="er-field-type">ENUM</span></div>
+            <div class="er-field"><span class="er-field-name">status</span><span class="er-field-type">ENUM</span></div>
+            <div class="er-field"><span class="er-field-name">due_date</span><span class="er-field-type">DATE</span></div>
+            <div class="er-field"><span class="er-field-name">estimated_hours</span><span class="er-field-type">INT</span></div>
+            <div class="er-field"><span class="er-field-name">completed_hours</span><span class="er-field-type">INT</span></div>
+            <div class="er-field"><span class="er-field-name">created_at</span><span class="er-field-type">TIMESTAMP</span></div>
+            <div class="er-field"><span class="er-field-name">user_id</span><span class="er-field-type">BIGINT</span><span class="er-field-constraint"><span class="badge fk">FK</span></span></div>
+          </div>
+        </div>
+        <div class="er-entity">
+          <div class="er-entity-header comments">💬 COMMENTS</div>
+          <div class="er-fields">
+            <div class="er-field"><span class="er-field-name">id</span><span class="er-field-type">BIGINT</span><span class="er-field-constraint"><span class="badge pk">PK</span></span></div>
+            <div class="er-field"><span class="er-field-name">content</span><span class="er-field-type">TEXT</span><span class="er-field-constraint"><span class="badge nn">NN</span></span></div>
+            <div class="er-field"><span class="er-field-name">created_at</span><span class="er-field-type">TIMESTAMP</span></div>
+            <div class="er-field"><span class="er-field-name">task_id</span><span class="er-field-type">BIGINT</span><span class="er-field-constraint"><span class="badge fk">FK</span></span></div>
+            <div class="er-field"><span class="er-field-name">user_id</span><span class="er-field-type">BIGINT</span><span class="er-field-constraint"><span class="badge fk">FK</span></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="er-relations">
+        <div class="er-relation">
+          <strong style="color:#1d4ed8">USERS</strong>
+          <span class="er-relation-arrow">→</span>
+          <strong style="color:#6d28d9">TASKS</strong>
+          <span class="er-relation-type">One-to-Many</span>
+          <span style="color:#64748b;font-size:11.5px;">A user can own many tasks. CASCADE DELETE.</span>
+        </div>
+        <div class="er-relation">
+          <strong style="color:#6d28d9">TASKS</strong>
+          <span class="er-relation-arrow">→</span>
+          <strong style="color:#059669">COMMENTS</strong>
+          <span class="er-relation-type">One-to-Many</span>
+          <span style="color:#64748b;font-size:11.5px;">A task can have many comments.</span>
+        </div>
+        <div class="er-relation">
+          <strong style="color:#1d4ed8">USERS</strong>
+          <span class="er-relation-arrow">→</span>
+          <strong style="color:#059669">COMMENTS</strong>
+          <span class="er-relation-type">One-to-Many</span>
+          <span style="color:#64748b;font-size:11.5px;">A user can write many comments.</span>
+        </div>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th>Constraint</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge pk">PK</span> Primary Key</td><td>Unique identifier — auto-incremented BIGINT</td></tr>
+        <tr><td><span class="badge fk">FK</span> Foreign Key</td><td>References parent table — enforces referential integrity</td></tr>
+        <tr><td><span class="badge nn">NN</span> Not Null</td><td>Field must always have a value</td></tr>
+        <tr><td><span class="badge uq">UQ</span> Unique</td><td>No two rows can share this value (e.g., email)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6. AI Workflow -->
+  <div class="section page-break" id="ai">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <div class="section-title">AI Workflow</div>
+    </div>
+
+    <div class="workflow-step">
+      <div class="workflow-step-num">1</div>
+      <div class="workflow-step-content">
+        <strong>User enters task title</strong>
+        <p>User types a task title (e.g. "Fix production crash on file upload") in the task form.</p>
+      </div>
+    </div>
+    <div class="workflow-arrow"></div>
+    <div class="workflow-step">
+      <div class="workflow-step-num">2</div>
+      <div class="workflow-step-content">
+        <strong>Frontend sends <code>POST /api/ai/generate</code></strong>
+        <p>Axios sends <code>{ title: "..." }</code> with the JWT Bearer token in the header.</p>
+      </div>
+    </div>
+    <div class="workflow-arrow"></div>
+    <div class="workflow-step">
+      <div class="workflow-step-num">3</div>
+      <div class="workflow-step-content">
+        <strong>AiService constructs Gemini prompt</strong>
+        <p>The Spring service builds a strict prompt instructing Gemini to return a valid JSON object only.</p>
+      </div>
+    </div>
+    <div class="workflow-arrow"></div>
+    <div class="workflow-step">
+      <div class="workflow-step-num">4</div>
+      <div class="workflow-step-content">
+        <strong>Gemini REST API call via <code>RestTemplate</code></strong>
+        <p>Spring's RestTemplate dispatches the request to Google's Gemini endpoint with the API key.</p>
+      </div>
+    </div>
+    <div class="workflow-arrow"></div>
+    <div class="workflow-step">
+      <div class="workflow-step-num">5</div>
+      <div class="workflow-step-content">
+        <strong>Response sanitization &amp; parsing</strong>
+        <p>Response is cleaned with regex (strips markdown <code>```json ... ```</code> blocks), then parsed by Jackson <code>ObjectMapper</code> into <code>AiGenerateResponse</code> DTO.</p>
+      </div>
+    </div>
+    <div class="workflow-arrow"></div>
+    <div class="workflow-step">
+      <div class="workflow-step-num">6</div>
+      <div class="workflow-step-content">
+        <strong>Form auto-filled ✅</strong>
+        <p>Frontend receives <code>{ description, priority, estimatedTime, estimatedHours }</code> and populates the task form instantly.</p>
+      </div>
+    </div>
+
+    <div class="fallback-box">
+      <strong>🔄 Smart Fallback (when API key is missing/invalid)</strong>
+      <p style="font-size:12px; margin-top:6px; color:#92400e;">The backend includes a keyword-detection fallback algorithm that still generates meaningful content:</p>
+      <div class="fallback-grid">
+        <div class="fallback-item">
+          <div class="kw">"bug", "fix", "crash", "error"</div>
+          <div class="res">→ HIGH priority · Emergency hotfix checklist</div>
+        </div>
+        <div class="fallback-item">
+          <div class="kw">"api", "database", "backend"</div>
+          <div class="res">→ HIGH priority · Backend engineering checklist</div>
+        </div>
+        <div class="fallback-item">
+          <div class="kw">"design", "ui", "frontend", "css"</div>
+          <div class="res">→ MEDIUM priority · UI/UX implementation checklist</div>
+        </div>
+        <div class="fallback-item">
+          <div class="kw">"test", "qa", "docs", "update"</div>
+          <div class="res">→ LOW priority · QA &amp; maintenance checklist</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Security -->
+  <div class="section" id="security">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <div class="section-title">Security Implementation</div>
+    </div>
+    <table>
+      <thead><tr><th>Feature</th><th>Implementation</th><th>Benefit</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Password Storage</strong></td>
+          <td>BCrypt hashing (cost factor 10)</td>
+          <td>Passwords are never stored as plaintext</td>
+        </tr>
+        <tr>
+          <td><strong>Authentication</strong></td>
+          <td>Stateless JWT Bearer tokens (HMAC-SHA256)</td>
+          <td>No server-side session storage needed</td>
+        </tr>
+        <tr>
+          <td><strong>Route Protection</strong></td>
+          <td>Spring Security <code>JwtAuthFilter</code> on every request</td>
+          <td>All <code>/api/tasks/**</code> require valid token</td>
+        </tr>
+        <tr>
+          <td><strong>CORS Policy</strong></td>
+          <td>Configured to allow only frontend origin</td>
+          <td>Prevents cross-origin attacks</td>
+        </tr>
+        <tr>
+          <td><strong>Error Handling</strong></td>
+          <td><code>@ControllerAdvice</code> global exception handler</td>
+          <td>Stack traces never leaked to the client</td>
+        </tr>
+        <tr>
+          <td><strong>Input Validation</strong></td>
+          <td>Jakarta Bean Validation on all DTOs</td>
+          <td>Prevents malformed data from reaching DB</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 8. Assignment Document -->
+  <div class="section page-break" id="assignment">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <div class="section-title">Assignment Document</div>
+    </div>
+
+    <h3>8.1 Assumptions Made</h3>
+    <ul>
+      <li><strong>Single-tenant Architecture:</strong> The system assumes users manage their own private tasks. Role-based access control is scaffolded but not strictly required for the core task CRUD loop.</li>
+      <li><strong>AI Availability:</strong> A valid <code>GEMINI_API_KEY</code> is assumed in the host environment. A smart keyword-based fallback handles API timeouts gracefully.</li>
+      <li><strong>Database Environment:</strong> The backend assumes MySQL 8.0+ dialect with DDL auto-create enabled in development.</li>
+    </ul>
+
+    <h3>8.2 Challenges Faced &amp; Solutions</h3>
+    <div class="challenge-card">
+      <div class="problem">🔴 AI Response Formatting (Markdown Injection)</div>
+      <div class="solution">Language models often inject markdown (e.g., <code>```json ... ```</code>) into responses. The backend required custom <strong>regex sanitization</strong> to reliably parse the AI string into a Java DTO before Jackson processing.</div>
+    </div>
+    <div class="challenge-card">
+      <div class="problem">🔴 Countdown NaN Bug</div>
+      <div class="solution">Old tasks without a <code>createdAt</code> field caused <code>new Date(undefined)</code> → NaN propagation. Fixed with an <code>isNaN(start)</code> guard — the component now returns <code>null</code> gracefully instead of displaying garbage values.</div>
+    </div>
+    <div class="challenge-card">
+      <div class="problem">🔴 UI State Synchronization</div>
+      <div class="solution">Ensuring the UI reacts optimistically to state changes (e.g., instantly updating task status without a full reload) required careful <strong>optimistic updates</strong> in the Context API with local state mutation before the async API call completes.</div>
+    </div>
+    <div class="challenge-card">
+      <div class="problem">🔴 TaskContext createTask Bug</div>
+      <div class="solution">The <code>createTask</code> function referenced undefined local variables (<code>title</code>, <code>description</code>) instead of spreading the <code>taskData</code> parameter. Fixed by replacing with <code>{ ...taskData, id: Date.now(), createdAt: new Date().toISOString() }</code>.</div>
+    </div>
+
+    <h3>8.3 Future Enhancements</h3>
+    <table>
+      <thead><tr><th>Enhancement</th><th>Technology</th><th>Priority</th></tr></thead>
+      <tbody>
+        <tr><td>Push Notifications for overdue tasks</td><td>WebSockets / SendGrid</td><td><span class="badge badge-orange">High</span></td></tr>
+        <tr><td>Collaborative workspaces with team assignment</td><td>Spring Security Roles</td><td><span class="badge badge-orange">High</span></td></tr>
+        <tr><td>True drag-and-drop Kanban</td><td>@dnd-kit / react-beautiful-dnd</td><td><span class="badge badge-blue">Medium</span></td></tr>
+        <tr><td>OAuth2 Sign-in (Google / GitHub)</td><td>Spring OAuth2 Client</td><td><span class="badge badge-blue">Medium</span></td></tr>
+        <tr><td>React Native mobile app</td><td>React Native + Expo</td><td><span class="badge badge-purple">Low</span></td></tr>
+      </tbody>
+    </table>
+
+    <h3>8.4 Conclusion</h3>
+    <p>
+      This project demonstrates end-to-end engineering proficiency across the entire software development lifecycle —
+      from conceptualization, database schema design, and secure REST API creation, to modern UI/UX implementation
+      and AI integration. The addition of <strong>Google Gemini AI</strong> integration successfully elevates a standard CRUD
+      application into an <strong>intelligent, user-centric productivity tool</strong>. The premium UI design, complete with animated
+      onboarding, real-time countdowns, dark mode, and responsive layout, delivers a truly production-ready experience.
+    </p>
+  </div>
+
+</div>
+
+<!-- ============================== FOOTER ============================== -->
+<div class="footer">
+  <strong>NeuraFlow — AI-Powered Task Management Portal</strong>
+  <div style="margin-top:6px;">Assignment Submission · June 2026</div>
+  <div class="footer-links">
+    <a href="https://github.com/SakshiGhanekar/AI--Productivity--Manager">📦 GitHub Repository</a>
+    <span style="color:#334155">|</span>
+    <span>👩‍💻 Sakshi Ghanekar</span>
+  </div>
+</div>
+
+<!-- Print Button -->
+<button class="print-btn" onclick="window.print()">🖨️ Save as PDF</button>
+
+</body>
+</html>

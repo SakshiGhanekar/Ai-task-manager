@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: task_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: task_management
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  backend:
+    build:
+      context: ./backend
+    container_name: task_backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/task_management?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      JWT_SECRET: 94a08da1fecbb6e8b46990538c7b50b2848cd5f1c324317fdbf4e918c5e62bc4
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: task_frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
