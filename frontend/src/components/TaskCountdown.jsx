@@ -27,100 +27,58 @@ const TaskCountdown = ({
     const updateCountdown = () => {
       const now = Date.now();
       
-      let targetDateStr = null;
-      let startMs = null;
-
-      // Robustly parse a date source (could be array from Java, string, or number)
-      const extractDateStr = (dateInput) => {
-        if (!dateInput) return null;
-        if (Array.isArray(dateInput)) {
-          // It's a java array [Y, M, D, h, m, s]
-          if (dateInput.length <= 3) {
-            return `${dateInput[0]}-${String(dateInput[1]).padStart(2, '0')}-${String(dateInput[2]).padStart(2, '0')}`;
-          }
-          // Convert array to UTC Date, then extract local YYYY-MM-DD
-          const dObj = new Date(Date.UTC(dateInput[0], dateInput[1] - 1, dateInput[2], dateInput[3] || 0, dateInput[4] || 0, dateInput[5] || 0));
-          return `${dObj.getFullYear()}-${String(dObj.getMonth() + 1).padStart(2, '0')}-${String(dObj.getDate()).padStart(2, '0')}`;
-        }
-        if (typeof dateInput === 'string') {
-          // If it's just "YYYY-MM-DD", use it directly
-          if (dateInput.length === 10) return dateInput;
-
-          let s = dateInput;
-          if (s.includes("T") && !s.endsWith("Z") && !s.includes("+") && !s.includes("-", 10)) {
-            s += "Z";
-          }
-          const d = new Date(s);
-          if (isNaN(d.getTime())) return dateInput.substring(0, 10);
-          
-          return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        }
-        if (typeof dateInput === 'number') {
-          const d = new Date(dateInput);
-          return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        }
-        return null;
-      };
-
-      // Try dueDate first, then fallback to createdAt
-      targetDateStr = extractDateStr(dueDate) || extractDateStr(createdAt);
-
-      if (!targetDateStr) {
+      if (!dueDate) {
         setTaskState(null);
         return;
       }
 
-      // End of that target day (23:59:59) in local time
-      const endOfDay = new Date(`${targetDateStr}T23:59:59`);
-      const deadlineMs = endOfDay.getTime();
+      // Robust parsing in case of Java array format, but usually it'll be ISO string
+      let dueStr = dueDate;
+      if (Array.isArray(dueDate)) {
+        const dObj = new Date(Date.UTC(dueDate[0], dueDate[1] - 1, dueDate[2], dueDate[3] || 0, dueDate[4] || 0, dueDate[5] || 0));
+        dueStr = dObj.toISOString();
+      } else if (typeof dueDate === 'string' && dueDate.includes("T") && !dueDate.endsWith("Z") && !dueDate.includes("+") && !dueDate.includes("-", 10)) {
+        dueStr += "Z";
+      }
 
-      if (isNaN(deadlineMs)) {
+      const due = new Date(dueStr).getTime();
+      const diff = due - now;
+
+      // Add console logs for debugging
+      console.log("NOW:", new Date());
+      console.log("DUE:", new Date(dueStr));
+      console.log("DIFF:", diff);
+
+      if (isNaN(due)) {
         setTaskState(null);
         return;
       }
 
-      // Determine start time for progress bar calculation
+      // Parse createdAt for progress bar calculation
+      let startMs = now - (estimatedHours * 3600000); // default to elapsed time based on estimate
       if (createdAt) {
+        let startStr = createdAt;
         if (Array.isArray(createdAt)) {
-          const [y, m, d, h = 0, min = 0, s = 0] = createdAt;
-          if (createdAt.length <= 3) {
-            startMs = new Date(y, m - 1, d).getTime();
-          } else {
-            startMs = new Date(Date.UTC(y, m - 1, d, h, min, s)).getTime();
+          startMs = Date.UTC(createdAt[0], createdAt[1] - 1, createdAt[2], createdAt[3] || 0, createdAt[4] || 0, createdAt[5] || 0);
+        } else {
+          if (typeof startStr === 'string' && startStr.includes("T") && !startStr.endsWith("Z") && !startStr.includes("+") && !startStr.includes("-", 10)) {
+            startStr += "Z";
           }
-        } else if (typeof createdAt === 'string') {
-          let s = createdAt;
-          if (s.includes("T") && !s.endsWith("Z") && !s.includes("+") && !s.includes("-", 10)) {
-            s += "Z";
-          }
-          startMs = new Date(s).getTime();
-        } else if (typeof createdAt === 'number') {
-          startMs = new Date(createdAt).getTime();
+          startMs = new Date(startStr).getTime();
         }
       }
-      
-      if (!startMs || isNaN(startMs)) {
-        // Fallback start time to beginning of the target day
-        startMs = new Date(`${targetDateStr}T00:00:00`).getTime();
-      }
 
-      // Cap startMs to not exceed deadlineMs
-      if (startMs >= deadlineMs) {
-        startMs = deadlineMs - 24 * 60 * 60 * 1000; // 1 day before
-      }
-
-      const totalDurationMs = deadlineMs - startMs;
-      const remaining = deadlineMs - now;
+      const totalDurationMs = due - startMs;
       const elapsed = now - startMs;
-
+      
       const timeProgress = totalDurationMs > 0
         ? Math.max(0, Math.min(100, (elapsed / totalDurationMs) * 100))
         : 0;
 
-      if (remaining <= 0) {
+      if (diff <= 0) {
         setTaskState({ status: "OVERDUE", text: "Time Overdue", progress: 100 });
       } else {
-        const remainingHours = remaining / (1000 * 60 * 60);
+        const remainingHours = diff / (1000 * 60 * 60);
         const days = Math.floor(remainingHours / 24);
         const hours = Math.floor(remainingHours % 24);
         const minutes = Math.floor((remainingHours % 1) * 60);

@@ -9,7 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -28,7 +28,7 @@ public class TaskRequest {
     @NotNull(message = "Status is required")
     private Status status;
 
-    private LocalDate dueDate;
+    private LocalDateTime dueDate;
 
     private String estimatedTime;
     

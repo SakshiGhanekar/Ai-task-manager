@@ -29,10 +29,29 @@ const TaskFormModal = ({ isOpen, onClose, onSave, taskToEdit }) => {
 
   const formatDueDate = (date) => {
     if (!date) return '';
-    if (Array.isArray(date)) {
-      return `${date[0]}-${String(date[1]).padStart(2, '0')}-${String(date[2]).padStart(2, '0')}`;
+    try {
+      let d;
+      if (Array.isArray(date)) {
+        d = new Date(Date.UTC(date[0], date[1] - 1, date[2], date[3] || 0, date[4] || 0, date[5] || 0));
+      } else {
+        // If string misses Z, append to treat as UTC (assuming backend sends UTC strings without Z)
+        let s = String(date);
+        if (s.includes("T") && !s.endsWith("Z") && !s.includes("+") && !s.includes("-", 10)) {
+          s += "Z";
+        }
+        d = new Date(s);
+      }
+      if (isNaN(d.getTime())) return '';
+      
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const h = String(d.getHours()).padStart(2, '0');
+      const min = String(d.getMinutes()).padStart(2, '0');
+      return `${y}-${m}-${day}T${h}:${min}`;
+    } catch {
+      return '';
     }
-    return String(date).substring(0, 10);
   };
 
   const parseEstimatedHours = (time) => {
@@ -76,6 +95,14 @@ const TaskFormModal = ({ isOpen, onClose, onSave, taskToEdit }) => {
     e.preventDefault();
     setIsSaving(true);
     try {
+      let finalDueDate = null;
+      if (formData.dueDate) {
+        finalDueDate = new Date(formData.dueDate).toISOString();
+      } else if (formData.estimatedHours) {
+        // If Due Date is omitted, calculate as Current Time + Estimated Hours
+        finalDueDate = new Date(Date.now() + parseInt(formData.estimatedHours) * 3600000).toISOString();
+      }
+
       const taskData = {
         ...formData,
         description: (formData.description || '')
@@ -84,7 +111,7 @@ const TaskFormModal = ({ isOpen, onClose, onSave, taskToEdit }) => {
         estimatedTime: formData.estimatedHours ? `${formData.estimatedHours} Hours` : null,
         estimatedHours: formData.estimatedHours ? parseInt(formData.estimatedHours) : null,
         completedHours: formData.completedHours ? parseInt(formData.completedHours) : 0,
-        dueDate: formData.dueDate ? formData.dueDate : null
+        dueDate: finalDueDate
       };
 
       // Try real backend first; fall back to localStorage via context
@@ -326,7 +353,7 @@ const TaskFormModal = ({ isOpen, onClose, onSave, taskToEdit }) => {
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                   <Calendar size={16} className="text-slate-400" /> Due Date
                 </label>
-                <input type="date" name="dueDate" value={formData.dueDate} onChange={handleChange} required className="premium-input [&::-webkit-calendar-picker-indicator]:dark:filter [&::-webkit-calendar-picker-indicator]:dark:invert" />
+                <input type="datetime-local" name="dueDate" value={formData.dueDate} onChange={handleChange} className="premium-input [&::-webkit-calendar-picker-indicator]:dark:filter [&::-webkit-calendar-picker-indicator]:dark:invert" />
               </div>
 
               <div className="space-y-3 relative">

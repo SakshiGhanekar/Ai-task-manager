@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -21,7 +20,8 @@ public class TaskResponse {
     private String description;
     private Priority priority;
     private Status status;
-    private LocalDate dueDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
+    private LocalDateTime dueDate;
     private String estimatedTime;
     private Integer estimatedHours;
     private Integer completedHours;

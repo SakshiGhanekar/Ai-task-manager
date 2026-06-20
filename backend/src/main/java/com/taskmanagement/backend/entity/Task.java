@@ -38,7 +38,7 @@ public class Task {
     private Status status;
 
     @Column(name = "due_date")
-    private LocalDate dueDate;
+    private LocalDateTime dueDate;
 
     @Column(name = "estimated_time")
     private String estimatedTime;
