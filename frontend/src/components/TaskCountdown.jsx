@@ -1,100 +1,125 @@
 import React, { useState, useEffect } from "react";
-import { Clock, Play, Square, Timer } from "lucide-react";
+import { Clock, CheckCircle, AlertTriangle, Timer } from "lucide-react";
 import { motion } from "framer-motion";
 
-const TaskCountdown = ({ status }) => {
-  const [inputMinutes, setInputMinutes] = useState("");
-  const [remainingSecs, setRemainingSecs] = useState(0);
-  const [isRunning, setIsRunning] = useState(false);
-  const [initialSecs, setInitialSecs] = useState(0);
+const TaskCountdown = ({
+  createdAt,
+  estimatedHours,
+  status,
+  showProgress = true,
+}) => {
+  const est = Number(estimatedHours) || 0;
+  
+  // Calculate remaining seconds based on creation time
+  const calculateRemainSecs = () => {
+    if (est <= 0) return 0;
+    const now = Date.now();
+    const created = createdAt ? new Date(createdAt).getTime() : now;
+    const elapsedSecs = Math.max(0, Math.floor((now - created) / 1000));
+    return Math.max(0, est * 3600 - elapsedSecs);
+  };
+
+  const [remainSecs, setRemainSecs] = useState(calculateRemainSecs());
 
   useEffect(() => {
-    let interval;
-    if (isRunning && remainingSecs > 0) {
-      interval = setInterval(() => {
-        setRemainingSecs((prev) => prev - 1);
-      }, 1000);
-    } else if (remainingSecs === 0 && isRunning) {
-      setIsRunning(false);
-    }
+    if (status === "DONE" || remainSecs <= 0) return;
+    const interval = setInterval(() => {
+      setRemainSecs(calculateRemainSecs());
+    }, 1000);
     return () => clearInterval(interval);
-  }, [isRunning, remainingSecs]);
+  }, [status, est, createdAt]);
 
-  if (status === "DONE") return null;
+  if (status === "DONE") {
+    return (
+      <div className="mt-3 flex items-center justify-between">
+        <div className="flex items-center gap-2 text-green-400 text-xs font-bold">
+          <CheckCircle size={13} />
+          Task Completed
+        </div>
+        <span className="px-2 py-1 rounded bg-green-500 text-white text-[10px] font-bold">
+          DONE
+        </span>
+      </div>
+    );
+  }
 
-  const handleStart = () => {
-    const mins = parseInt(inputMinutes);
-    if (!isNaN(mins) && mins > 0) {
-      const secs = mins * 60;
-      setRemainingSecs(secs);
-      setInitialSecs(secs);
-      setIsRunning(true);
-    }
+  const progress = est > 0 
+    ? Math.min(100, Math.max(0, ((est * 3600 - remainSecs) / (est * 3600)) * 100)) 
+    : 0;
+
+  const h = Math.floor(remainSecs / 3600);
+  const m = Math.floor((remainSecs % 3600) / 60);
+  const s = Math.floor(remainSecs % 60);
+  
+  let text = "0h 0m 0s";
+  if (est > 0) {
+    text = `${h}h ${m}m ${s}s`;
+  }
+
+  let colorBase = "text-green-400";
+  let badgeColor = "bg-green-500/20 text-green-400 border border-green-500/30";
+  let barColor = "bg-green-400";
+  let statusText = "ACTIVE";
+  let Icon = Clock;
+  let animatePulse = false;
+
+  if (est > 0 && remainSecs <= 0) {
+    colorBase = "text-red-500";
+    badgeColor = "bg-red-500 text-white border border-red-500";
+    barColor = "bg-red-500";
+    statusText = "TIME UP";
+    Icon = AlertTriangle;
+    text = "0h 0m 0s";
+    animatePulse = true;
+  } else if (progress >= 50 && est > 0) {
+    colorBase = "text-orange-400";
+    badgeColor = "bg-orange-500/20 text-orange-400 border border-orange-500/30";
+    barColor = "bg-orange-400";
+  }
+
+  // To display the due time in Indian Standard Time (IST)
+  const getDueTimeIST = () => {
+    if (est <= 0) return null;
+    const created = createdAt ? new Date(createdAt).getTime() : Date.now();
+    const dueTime = new Date(created + est * 3600000);
+    return dueTime.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "short", timeStyle: "short" });
   };
 
-  const handleStop = () => {
-    setIsRunning(false);
-    setRemainingSecs(0);
-    setInputMinutes("");
-  };
-
-  const formatTime = (secs) => {
-    const h = Math.floor(secs / 3600);
-    const m = Math.floor((secs % 3600) / 60);
-    const s = secs % 60;
-    if (h > 0) return `${h}h ${m}m ${s}s`;
-    return `${m}m ${s}s`;
-  };
-
-  const progress = initialSecs > 0 ? ((initialSecs - remainingSecs) / initialSecs) * 100 : 0;
+  const dueIST = getDueTimeIST();
 
   return (
-    <div className="mt-3 bg-slate-800/50 dark:bg-white/5 p-3 rounded-lg border border-slate-200 dark:border-white/10">
-      <div className="flex items-center gap-2 mb-2">
-        <Timer size={14} className="text-primary-500" />
-        <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">Custom Timer</span>
-      </div>
-      
-      {!isRunning && remainingSecs === 0 ? (
-        <div className="flex items-center gap-2">
-          <input
-            type="number"
-            min="1"
-            placeholder="Mins"
-            value={inputMinutes}
-            onChange={(e) => setInputMinutes(e.target.value)}
-            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-xs text-slate-800 dark:text-white w-20 outline-none focus:border-primary-500"
-          />
-          <button
-            onClick={handleStart}
-            className="flex items-center gap-1 bg-primary-500 hover:bg-primary-600 text-white px-3 py-1 rounded text-xs font-bold transition-colors"
-          >
-            <Play size={12} fill="currentColor" />
-            Start
-          </button>
+    <div className="mt-3">
+      {/* Due Time Display in IST */}
+      {dueIST && (
+        <div className="flex items-center gap-3 mb-3 pb-2 border-b border-slate-200 dark:border-white/5">
+          <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+            <Timer size={11} className="text-primary-500" />
+            Due (IST): {dueIST}
+          </div>
         </div>
-      ) : (
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2 text-primary-500 text-sm font-bold tabular-nums">
-              <Clock size={14} />
-              {formatTime(remainingSecs)}
-            </div>
-            <button
-              onClick={handleStop}
-              className="flex items-center gap-1 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 px-2 py-1 rounded text-[10px] font-bold transition-colors"
-            >
-              <Square size={10} fill="currentColor" />
-              Stop
-            </button>
-          </div>
-          <div className="w-full bg-slate-200 dark:bg-slate-900 h-1.5 rounded-full overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              className="h-full rounded-full bg-primary-500"
-            />
-          </div>
+      )}
+
+      <div className="flex items-center justify-between mb-2">
+        <div className={`flex items-center gap-2 text-xs font-bold ${colorBase}`}>
+          <motion.div animate={animatePulse ? { scale: [1, 1.2, 1] } : {}} transition={{ repeat: Infinity, duration: 1 }}>
+            <Icon size={13} />
+          </motion.div>
+          <span className="tabular-nums tracking-tight">{text}</span>
+        </div>
+
+        <span className={`px-2 py-1 rounded text-[10px] font-bold ${badgeColor}`}>
+          {statusText}
+        </span>
+      </div>
+
+      {showProgress && (
+        <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden shadow-inner">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 1, ease: "linear" }}
+            className={`h-full rounded-full ${barColor} shadow-[0_0_10px_rgba(0,0,0,0.2)]`}
+          />
         </div>
       )}
     </div>
