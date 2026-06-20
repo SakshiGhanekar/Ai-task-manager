@@ -105,19 +105,7 @@ const TaskCountdown = ({
   }
 
   if (taskState.status === "OVERDUE") {
-    return (
-      <div className="mt-3">
-        <div className="flex items-center justify-end mb-2">
-          <span className="px-2 py-1 rounded bg-red-500 text-white text-[10px] font-bold">
-            OVERDUE
-          </span>
-        </div>
-
-        <div className="w-full bg-slate-800 h-1.5 rounded">
-          <div className="bg-red-500 h-full w-full rounded" />
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (
