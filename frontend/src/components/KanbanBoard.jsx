@@ -86,7 +86,7 @@ const KanbanBoard = ({ tasks, onStatusChange, onEdit, onDelete }) => {
                       <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider border ${getPriorityStyle(task.priority)}`}>
                         {task.priority}
                       </span>
-                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex gap-1 transition-opacity">
                         <button onClick={() => onEdit(task)} className="p-1.5 text-zinc-400 hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors">
                           <Edit2 size={14} />
                         </button>

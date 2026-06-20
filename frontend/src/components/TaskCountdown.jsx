@@ -66,11 +66,11 @@ const TaskCountdown = ({
       let text = "";
 
       if (days > 0) {
-        text = `d h Left`;
+        text = `${days}d ${hours}h Left`;
       } else if (hours > 0) {
-        text = `h m Left`;
+        text = `${hours}h ${minutes}m Left`;
       } else {
-        text = `m Left`;
+        text = `${minutes}m Left`;
       }
 
       setTaskState({
@@ -105,7 +105,17 @@ const TaskCountdown = ({
   }
 
   if (taskState.status === "OVERDUE") {
-    return null;
+    return (
+      <div className="mt-3 flex items-center justify-between">
+        <div className="flex items-center gap-2 text-red-500 text-xs font-bold">
+          <AlertTriangle size={13} />
+          Time Up
+        </div>
+        <span className="px-2 py-1 rounded bg-red-500 text-white text-[10px] font-bold">
+          OVERDUE
+        </span>
+      </div>
+    );
   }
 
   return (
@@ -125,7 +135,7 @@ const TaskCountdown = ({
         <div className="w-full bg-slate-800 h-1.5 rounded overflow-hidden">
           <motion.div
             animate={{
-              width: `%`,
+              width: `${taskState.progress}%`,
             }}
             transition={{ duration: 0.5 }}
             className="h-full bg-green-400 rounded"
