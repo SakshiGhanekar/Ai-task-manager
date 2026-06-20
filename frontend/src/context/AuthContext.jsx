@@ -46,17 +46,19 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('email', email);
       setUser({ name, email });
       return { success: true };
-    } catch (backendError) {
       const isNetworkError = !backendError.response;
-      const isServerError  = backendError.response?.status >= 500;
+      const isSleepingError = isNetworkError || backendError.response?.status === 502 || backendError.response?.status === 504 || backendError.response?.status === 503;
 
-      if (isNetworkError || isServerError) {
+      if (isSleepingError) {
         return { success: false, message: 'Server is waking up. Please wait 30 seconds and try again.' };
       }
 
+      const serverMessage = backendError.response?.data?.message || backendError.response?.data?.error;
+      const isDuplicate = backendError.response?.status === 500;
+      
       return {
         success: false,
-        message: backendError.response?.data?.message || 'Registration failed. Email might already be registered.',
+        message: serverMessage || (isDuplicate ? 'Email already registered. Please sign in.' : 'Registration failed. Please try again.'),
       };
     }
   };
@@ -71,11 +73,10 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('email', userEmail || email);
       setUser({ name: name || email, email: userEmail || email });
       return { success: true };
-    } catch (backendError) {
       const isNetworkError = !backendError.response;
-      const isServerError  = backendError.response?.status >= 500;
+      const isSleepingError = isNetworkError || backendError.response?.status === 502 || backendError.response?.status === 504 || backendError.response?.status === 503;
 
-      if (isNetworkError || isServerError) {
+      if (isSleepingError) {
         return { success: false, message: 'Server is waking up. Please wait 30 seconds and try again.' };
       }
 
