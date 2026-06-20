@@ -13,6 +13,7 @@ if (envBaseUrl && !envBaseUrl.endsWith('api/')) {
 const baseURL = envBaseUrl;
 const api = axios.create({
   baseURL,
+  timeout: 1500, // Fast timeout (1.5s) to instantly fall back to Demo Mode if backend is offline
 });
 
 api.interceptors.request.use(
