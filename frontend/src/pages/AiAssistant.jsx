@@ -195,30 +195,27 @@ const AiAssistant = () => {
       
       setMessages(prev => [...prev, { id: Date.now() + 1, role: 'ai', content: aiResponse, isTyping: true }]);
     } catch (error) {
-      console.error("AI Chat Error:", error);
+      console.warn("Backend not available, falling back to demo mode:", error.message);
       
-      let errorMessage = "I'm having trouble connecting to my backend servers right now. Please make sure the Spring Boot application is running and try again!";
+      // Simulated AI responses for when the backend is not running
+      const demoResponses = [
+        "That's a great question! Since I'm currently running in **Demo Mode** without a backend server, I can't generate a real AI response right now. \n\nHowever, imagine a highly intelligent, perfectly structured breakdown of your task appearing right here! 🚀",
+        "I can certainly help with that. \n\n*(Note: You are in Demo Mode because the backend server is disconnected. Please run the Spring Boot backend to enable real AI responses.)*",
+        "Here is a suggested approach:\n\n1. **Define Scope**: Clearly outline your goals and deliverables.\n2. **Break it Down**: Divide the project into smaller, manageable tasks.\n3. **Execute**: Work through the tasks one by one.\n\n*(This is a simulated response as the backend server is currently offline)*",
+        "I'd recommend using a modular architecture for this. It keeps the codebase clean and maintainable. \n\n```javascript\n// Demo Code Snippet\nfunction breakDownTask(task) {\n  return task.split(' ').map(step => `Execute: ${step}`);\n}\n```\n*(Simulated response)*"
+      ];
       
-      if (error.response) {
-        // The request was made and the server responded with a status code outside the 2xx range
-        errorMessage = `Server Error (${error.response.status}): ${error.response.data?.message || error.message}`;
-      } else if (error.request) {
-        // The request was made but no response was received
-        errorMessage = `Network Error: Could not reach the backend. Are you sure the backend is deployed and running at ${api.defaults.baseURL}?`;
-      } else {
-        // Something happened in setting up the request
-        errorMessage = `Error: ${error.message}`;
-      }
+      const aiResponse = demoResponses[Math.floor(Math.random() * demoResponses.length)];
 
       setTimeout(() => {
         setMessages(prev => [...prev, { 
           id: Date.now() + 1, 
           role: 'ai', 
-          content: errorMessage,
+          content: aiResponse,
           isTyping: true
         }]);
         setIsLoading(false);
-      }, 1500);
+      }, 1000);
       return;
     } 
     setIsLoading(false);
