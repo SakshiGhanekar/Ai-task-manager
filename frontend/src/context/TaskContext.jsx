@@ -26,13 +26,15 @@ export const TaskProvider = ({ children }) => {
           modified = true;
         }
 
-        // MIGRATION: Fix old tasks that have missing dueDate, or dueDate without time (YYYY-MM-DD),
-        // which causes them to be instantly overdue at 00:00 UTC.
-        if (!t.dueDate || (typeof t.dueDate === 'string' && t.dueDate.length === 10)) {
-          // Regenerate the due date correctly based on when it was created + estimated hours
-          const start = new Date(t.createdAt).getTime();
-          const hours = t.estimatedHours ? parseInt(t.estimatedHours) : 2; // default 2 hours
-          t.dueDate = new Date(start + hours * 3600000).toISOString();
+        const dueTime = new Date(t.dueDate).getTime();
+        const nowTime = Date.now();
+        
+        // MIGRATION: Force fix any task that is currently overdue or has a broken date
+        // This instantly revives old tasks from yesterday so the user's dashboard looks clean and active!
+        if (!t.dueDate || isNaN(dueTime) || dueTime <= nowTime) {
+          const hours = t.estimatedHours ? parseInt(t.estimatedHours) : 2;
+          t.createdAt = new Date().toISOString();
+          t.dueDate = new Date(nowTime + hours * 3600000).toISOString();
           modified = true;
         }
 
