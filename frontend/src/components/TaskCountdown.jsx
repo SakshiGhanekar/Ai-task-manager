@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Clock, AlertTriangle, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -107,12 +107,7 @@ const TaskCountdown = ({
   if (taskState.status === "OVERDUE") {
     return (
       <div className="mt-3">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2 text-red-500 text-xs font-bold">
-            <AlertTriangle size={13} />
-            Time Overdue
-          </div>
-
+        <div className="flex items-center justify-end mb-2">
           <span className="px-2 py-1 rounded bg-red-500 text-white text-[10px] font-bold">
             OVERDUE
           </span>
