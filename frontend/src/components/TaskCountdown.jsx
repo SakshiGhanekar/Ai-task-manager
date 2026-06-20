@@ -92,22 +92,21 @@ const TaskCountdown = ({
     textColor = "text-green-400";
   }
 
-  // To display the due time in Indian Standard Time (IST)
-  const getDueTimeIST = () => {
-    const target = getTargetTime();
-    if (!target) return null;
-    return new Date(target).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "short", timeStyle: "short" });
+  // To display the start/updated time in Indian Standard Time (IST)
+  const getStartTimeIST = () => {
+    const base = updatedAt ? new Date(updatedAt).getTime() : (createdAt ? new Date(createdAt).getTime() : Date.now());
+    return new Date(base).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "short", timeStyle: "short" });
   };
 
-  const dueIST = getDueTimeIST();
+  const startIST = getStartTimeIST();
 
   return (
     <div className="mt-3">
-      {dueIST && (
+      {startIST && (
         <div className="flex items-center gap-3 mb-2">
           <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-400">
             <Timer size={11} className="text-primary-500" />
-            Due (IST): {dueIST}
+            Started (IST): {startIST}
           </div>
         </div>
       )}
