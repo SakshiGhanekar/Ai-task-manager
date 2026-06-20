@@ -103,7 +103,7 @@ const MarkdownRenderer = ({ content }) => {
   );
 };
 
-const TypewriterMarkdown = ({ content, isTyping, onComplete }) => {
+const TypewriterMarkdown = ({ content, isTyping, onComplete, onContentChange }) => {
   const [displayedContent, setDisplayedContent] = useState('');
   const contentRef = useRef(content);
   contentRef.current = content;
@@ -131,6 +131,12 @@ const TypewriterMarkdown = ({ content, isTyping, onComplete }) => {
     
     return () => clearInterval(timer);
   }, [content, isTyping, onComplete]);
+
+  useEffect(() => {
+    if (isTyping && onContentChange) {
+      onContentChange();
+    }
+  }, [displayedContent, isTyping, onContentChange]);
 
   return (
     <div className="prose prose-slate dark:prose-invert max-w-none w-full">
@@ -334,7 +340,8 @@ const AiAssistant = () => {
                       <TypewriterMarkdown 
                         content={msg.content} 
                         isTyping={msg.isTyping} 
-                        onComplete={() => handleTypingComplete(msg.id)} 
+                        onComplete={() => handleTypingComplete(msg.id)}
+                        onContentChange={scrollToBottom}
                       />
                     )}
                   </div>
