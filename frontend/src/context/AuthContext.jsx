@@ -46,6 +46,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('email', email);
       setUser({ name, email });
       return { success: true };
+    } catch (backendError) {
       const isNetworkError = !backendError.response;
       const isSleepingError = isNetworkError || backendError.response?.status === 502 || backendError.response?.status === 504 || backendError.response?.status === 503;
 
@@ -73,6 +74,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('email', userEmail || email);
       setUser({ name: name || email, email: userEmail || email });
       return { success: true };
+    } catch (backendError) {
       const isNetworkError = !backendError.response;
       const isSleepingError = isNetworkError || backendError.response?.status === 502 || backendError.response?.status === 504 || backendError.response?.status === 503;
 
