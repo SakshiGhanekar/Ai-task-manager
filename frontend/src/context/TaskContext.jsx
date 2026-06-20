@@ -17,6 +17,19 @@ export const TaskProvider = ({ children }) => {
     setTimeout(() => {
       let savedTasks = JSON.parse(localStorage.getItem('mockTasks') || '[]');
 
+      // Repair any tasks that are missing createdAt (corrupted by old bug)
+      let repaired = false;
+      savedTasks = savedTasks.map(t => {
+        if (!t.createdAt) {
+          repaired = true;
+          return { ...t, createdAt: new Date().toISOString() };
+        }
+        return t;
+      });
+      if (repaired) {
+        localStorage.setItem('mockTasks', JSON.stringify(savedTasks));
+      }
+
       if (filters.status) {
         savedTasks = savedTasks.filter(t => t.status === filters.status);
       }
@@ -47,7 +60,8 @@ export const TaskProvider = ({ children }) => {
 
   const createTask = async (taskData) => {
     let savedTasks = JSON.parse(localStorage.getItem('mockTasks') || '[]');
-    const newTask = { ...taskData, id: Date.now(), createdAt: new Date().toISOString() };
+    const now = new Date().toISOString();
+    const newTask = { ...taskData, id: Date.now(), createdAt: now, updatedAt: now };
     savedTasks.unshift(newTask);
     localStorage.setItem('mockTasks', JSON.stringify(savedTasks));
     await fetchTasks();
@@ -58,7 +72,13 @@ export const TaskProvider = ({ children }) => {
 
   const updateTask = async (id, taskData) => {
     let savedTasks = JSON.parse(localStorage.getItem('mockTasks') || '[]');
-    savedTasks = savedTasks.map(t => t.id === id ? { ...t, ...taskData } : t);
+    savedTasks = savedTasks.map(t => {
+      if (t.id === id) {
+        // CRITICAL: always preserve the original createdAt so countdown doesn't reset
+        return { ...t, ...taskData, createdAt: t.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
+      }
+      return t;
+    });
     localStorage.setItem('mockTasks', JSON.stringify(savedTasks));
     await fetchTasks();
     await fetchStats();
