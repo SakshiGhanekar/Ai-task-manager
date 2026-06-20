@@ -38,7 +38,6 @@ export const AuthProvider = ({ children }) => {
 
   // ── Register ───────────────────────────────────────────────────────────────
   const register = async (name, email, password) => {
-    // 1️⃣ Try real backend
     try {
       const response = await api.post('auth/register', { name, email, password });
       const { token } = response.data;
@@ -48,37 +47,22 @@ export const AuthProvider = ({ children }) => {
       setUser({ name, email });
       return { success: true };
     } catch (backendError) {
-      // Network error or 5xx → fall back to demo auth
       const isNetworkError = !backendError.response;
       const isServerError  = backendError.response?.status >= 500;
 
       if (isNetworkError || isServerError) {
-        // 2️⃣ Demo / local fallback
-        const users = getUsers();
-        if (users.find((u) => u.email === email)) {
-          return { success: false, message: 'Email already registered. Please sign in.' };
-        }
-        const newUser = { name, email, password };
-        saveUsers([...users, newUser]);
-        const token = makeDemoToken(email);
-        localStorage.setItem('token', token);
-        localStorage.setItem('name', name);
-        localStorage.setItem('email', email);
-        setUser({ name, email });
-        return { success: true };
+        return { success: false, message: 'Server is waking up. Please wait 30 seconds and try again.' };
       }
 
-      // 4xx error from backend (e.g. duplicate email)
       return {
         success: false,
-        message: backendError.response?.data?.message || 'Registration failed. Please try again.',
+        message: backendError.response?.data?.message || 'Registration failed. Email might already be registered.',
       };
     }
   };
 
   // ── Login ──────────────────────────────────────────────────────────────────
   const login = async (email, password) => {
-    // 1️⃣ Try real backend
     try {
       const response = await api.post('auth/login', { email, password });
       const { token, name, email: userEmail } = response.data;
@@ -92,36 +76,7 @@ export const AuthProvider = ({ children }) => {
       const isServerError  = backendError.response?.status >= 500;
 
       if (isNetworkError || isServerError) {
-        // 2️⃣ Demo / local fallback
-        const users = getUsers();
-        const found = users.find((u) => u.email === email && u.password === password);
-        if (!found) {
-          return { success: false, message: 'Invalid email or password.' };
-        }
-        const token = makeDemoToken(email);
-        localStorage.setItem('token', token);
-        localStorage.setItem('name', found.name);
-        localStorage.setItem('email', found.email);
-        setUser({ name: found.name, email: found.email });
-        return { success: true };
-      }
-
-      // If we got a 4xx error (e.g. 403 Invalid Credentials), the database might be empty.
-      // Let's check if they exist in the local demo database and automatically migrate/register them!
-      const users = getUsers();
-      const found = users.find((u) => u.email === email && u.password === password);
-      if (found) {
-        try {
-          const regResponse = await api.post('auth/register', { name: found.name, email: found.email, password: found.password });
-          const { token } = regResponse.data;
-          localStorage.setItem('token', token);
-          localStorage.setItem('name', found.name);
-          localStorage.setItem('email', found.email);
-          setUser({ name: found.name, email: found.email });
-          return { success: true };
-        } catch (regError) {
-          return { success: false, message: 'Could not migrate your account. Please sign up again.' };
-        }
+        return { success: false, message: 'Server is waking up. Please wait 30 seconds and try again.' };
       }
 
       return {
