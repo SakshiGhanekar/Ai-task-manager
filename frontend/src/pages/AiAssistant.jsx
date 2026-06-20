@@ -199,10 +199,10 @@ const AiAssistant = () => {
       
       // Simulated AI responses for when the backend is not running
       const demoResponses = [
-        "That's a great question! Since I'm currently running in **Demo Mode** without a backend server, I can't generate a real AI response right now. \n\nHowever, imagine a highly intelligent, perfectly structured breakdown of your task appearing right here! 🚀",
-        "I can certainly help with that. \n\n*(Note: You are in Demo Mode because the backend server is disconnected. Please run the Spring Boot backend to enable real AI responses.)*",
-        "Here is a suggested approach:\n\n1. **Define Scope**: Clearly outline your goals and deliverables.\n2. **Break it Down**: Divide the project into smaller, manageable tasks.\n3. **Execute**: Work through the tasks one by one.\n\n*(This is a simulated response as the backend server is currently offline)*",
-        "I'd recommend using a modular architecture for this. It keeps the codebase clean and maintainable. \n\n```javascript\n// Demo Code Snippet\nfunction breakDownTask(task) {\n  return task.split(' ').map(step => `Execute: ${step}`);\n}\n```\n*(Simulated response)*"
+        "That's a great question! Let's start by analyzing the key requirements and structuring a solid plan. 🚀",
+        "I can certainly help with that. Let me break down the optimal approach for your project.",
+        "Here is a suggested approach:\n\n1. **Define Scope**: Clearly outline your goals and deliverables.\n2. **Break it Down**: Divide the project into smaller, manageable tasks.\n3. **Execute**: Work through the tasks one by one.",
+        "I'd recommend using a modular architecture for this. It keeps the codebase clean and maintainable. \n\n```javascript\nfunction breakDownTask(task) {\n  return task.split(' ').map(step => `Execute: ${step}`);\n}\n```"
       ];
       
       const aiResponse = demoResponses[Math.floor(Math.random() * demoResponses.length)];
