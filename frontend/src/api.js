@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-let envBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/';
+let envBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://ai-task-manager-d8w1.onrender.com/api/';
 
 // Auto-correct common configuration mistakes (missing /api or trailing slash)
 if (envBaseUrl && !envBaseUrl.endsWith('/')) {
