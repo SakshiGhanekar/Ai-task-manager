@@ -60,6 +60,15 @@ const TaskCountdown = ({
     );
   }
 
+  const now = Date.now();
+  const targetTime = getTargetTime();
+  const createdTime = createdAt ? new Date(createdAt).getTime() : targetTime - (est > 0 ? est * 3600000 : 3600000);
+  
+  const totalSecs = Math.floor((targetTime - createdTime) / 1000);
+  const progress = totalSecs > 0 
+    ? Math.min(100, Math.max(0, ((totalSecs - remainSecs) / totalSecs) * 100)) 
+    : 0;
+
   const h = Math.floor(remainSecs / 3600);
   const m = Math.floor((remainSecs % 3600) / 60);
   const s = Math.floor(remainSecs % 60);
@@ -67,6 +76,20 @@ const TaskCountdown = ({
   let text = "0h 0m 0s";
   if (est > 0) {
     text = `${h}h ${m}m ${s}s`;
+  }
+
+  let barColor = "bg-green-400";
+  let textColor = "text-slate-500 dark:text-slate-400";
+
+  // Change colors based on progress percentage
+  if (progress >= 80) {
+    barColor = "bg-red-500";
+    textColor = "text-red-500";
+  } else if (progress >= 40) {
+    barColor = "bg-orange-400";
+    textColor = "text-orange-400";
+  } else if (est > 0) {
+    textColor = "text-green-400";
   }
 
   // To display the due time in Indian Standard Time (IST)
@@ -89,10 +112,21 @@ const TaskCountdown = ({
         </div>
       )}
 
-      <div className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400">
+      <div className={`flex items-center gap-2 text-xs font-bold ${textColor}`}>
         <Clock size={13} />
         <span className="tabular-nums tracking-tight">{text}</span>
       </div>
+
+      {showProgress && (
+        <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden shadow-inner mt-2">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 1, ease: "linear" }}
+            className={`h-full rounded-full ${barColor} shadow-[0_0_10px_rgba(0,0,0,0.2)]`}
+          />
+        </div>
+      )}
     </div>
   );
 };
