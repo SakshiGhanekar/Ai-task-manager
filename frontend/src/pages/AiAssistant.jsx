@@ -157,6 +157,14 @@ const AiAssistant = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
+
+  const handleSuggestionClick = (text) => {
+    setInput(text + ' ');
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 10);
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -295,7 +303,7 @@ const AiAssistant = () => {
               {SUGGESTED_PROMPTS.map((prompt, i) => (
                 <button
                   key={i}
-                  onClick={(e) => handleSubmit(e, prompt.text)}
+                  onClick={() => handleSuggestionClick(prompt.text)}
                   className="flex flex-col items-center gap-3 p-4 rounded-2xl border border-[var(--border-color)] bg-brandSidebar hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all hover:-translate-y-1 hover:shadow-lg group"
                 >
                   <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform">
@@ -384,7 +392,7 @@ const AiAssistant = () => {
             {SUGGESTED_PROMPTS.map((prompt, i) => (
               <button
                 key={i}
-                onClick={(e) => handleSubmit(e, prompt.text)}
+                onClick={() => handleSuggestionClick(prompt.text)}
                 className="px-3 py-1.5 text-[11px] sm:text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/50 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-[var(--border-color)] flex items-center gap-1.5 whitespace-nowrap"
               >
                 {prompt.text}
@@ -397,6 +405,7 @@ const AiAssistant = () => {
             <Sparkles size={20} />
           </div>
           <input 
+            ref={inputRef}
             type="text" 
             value={input}
             onChange={(e) => setInput(e.target.value)}
