@@ -96,11 +96,15 @@ const TaskFormModal = ({ isOpen, onClose, onSave, taskToEdit }) => {
     setIsSaving(true);
     try {
       let finalDueDate = null;
-      if (formData.dueDate) {
+      
+      const oldEst = taskToEdit ? (taskToEdit.estimatedHours ?? parseEstimatedHours(taskToEdit.estimatedTime) ?? 4) : null;
+      const newEst = parseInt(formData.estimatedHours) || 1;
+      
+      // If estimatedHours changed or no previous due date, recalculate based on current time
+      if (!taskToEdit || newEst !== oldEst || !formData.dueDate) {
+        finalDueDate = new Date(Date.now() + newEst * 3600000).toISOString();
+      } else {
         finalDueDate = new Date(formData.dueDate).toISOString();
-      } else if (formData.estimatedHours) {
-        // If Due Date is omitted, calculate as Current Time + Estimated Hours
-        finalDueDate = new Date(Date.now() + parseInt(formData.estimatedHours) * 3600000).toISOString();
       }
 
       const taskData = {
