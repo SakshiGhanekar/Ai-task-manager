@@ -4,12 +4,12 @@ import { motion } from "framer-motion";
 
 /**
  * TaskCountdown
- * Uses createdAt + estimatedHours to count down time remaining.
+ * Priority: dueDate (end-of-day) → createdAt + estimatedHours fallback.
  * Falls back gracefully when data is missing.
  */
 const TaskCountdown = ({
   createdAt,
-  dueDate,       // legacy prop, ignored if createdAt is present
+  dueDate,
   estimatedHours = 0,
   completedHours = 0,
   status,
@@ -24,38 +24,87 @@ const TaskCountdown = ({
       return;
     }
 
-    // Need createdAt + estimatedHours to calculate countdown
-    let startStr = createdAt || dueDate;
-    if (!startStr || !estimatedHours || estimatedHours <= 0) {
-      // No timer data — show nothing
-      setTaskState(null);
-      return;
-    }
-
-    if (typeof startStr === 'string' && startStr.includes("T") && !startStr.endsWith("Z") && !startStr.includes("+") && !startStr.includes("-", 10)) {
-      startStr += "Z";
-    }
-
     const updateCountdown = () => {
-      const start = new Date(startStr).getTime();
-      const now = new Date().getTime();
+      const now = Date.now();
+      
+      // Determine the target date string (YYYY-MM-DD)
+      let targetDateStr = null;
+      let startMs = null;
 
-      // If date parsing failed, bail out
-      if (isNaN(start)) {
+      // Robustly parse a date source (could be array from Java, string, or number)
+      const extractDateStr = (dateInput) => {
+        if (!dateInput) return null;
+        if (Array.isArray(dateInput)) {
+          return `${dateInput[0]}-${String(dateInput[1]).padStart(2, '0')}-${String(dateInput[2]).padStart(2, '0')}`;
+        }
+        if (typeof dateInput === 'string') {
+          return dateInput.substring(0, 10);
+        }
+        if (typeof dateInput === 'number') {
+          const d = new Date(dateInput);
+          return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+        return null;
+      };
+
+      // Try dueDate first, then fallback to createdAt
+      targetDateStr = extractDateStr(dueDate) || extractDateStr(createdAt);
+
+      if (!targetDateStr) {
         setTaskState(null);
         return;
       }
 
-      const elapsedHours = (now - start) / (1000 * 60 * 60);
-      const remaining = estimatedHours - elapsedHours;
-      const timeProgress = estimatedHours > 0 ? Math.max(0, Math.min(100, (elapsedHours / estimatedHours) * 100)) : 0;
+      // End of that day (23:59:59) in local time
+      const endOfDay = new Date(`${targetDateStr}T23:59:59`);
+      const deadlineMs = endOfDay.getTime();
+
+      if (isNaN(deadlineMs)) {
+        setTaskState(null);
+        return;
+      }
+
+      // Determine start time for progress bar calculation
+      if (createdAt) {
+        let startStr = createdAt;
+        if (Array.isArray(startStr)) {
+          const [y, m, d, h = 0, min = 0, s = 0] = startStr;
+          startMs = new Date(y, m - 1, d, h, min, s).getTime();
+        } else if (typeof startStr === 'string') {
+          if (startStr.includes("T") && !startStr.endsWith("Z") && !startStr.includes("+") && !startStr.includes("-", 10)) {
+            startStr += "Z";
+          }
+          startMs = new Date(startStr).getTime();
+        } else if (typeof startStr === 'number') {
+          startMs = new Date(startStr).getTime();
+        }
+      }
+      
+      if (!startMs || isNaN(startMs)) {
+        // Fallback start time to beginning of the target day
+        startMs = new Date(`${targetDateStr}T00:00:00`).getTime();
+      }
+
+      // Cap startMs to not exceed deadlineMs
+      if (startMs >= deadlineMs) {
+        startMs = deadlineMs - 24 * 60 * 60 * 1000; // 1 day before
+      }
+
+      const totalDurationMs = deadlineMs - startMs;
+      const remaining = deadlineMs - now;
+      const elapsed = now - startMs;
+
+      const timeProgress = totalDurationMs > 0
+        ? Math.max(0, Math.min(100, (elapsed / totalDurationMs) * 100))
+        : 0;
 
       if (remaining <= 0) {
-        setTaskState({ status: "OVERDUE", text: "Overdue", progress: 100 });
+        setTaskState({ status: "OVERDUE", text: "Time Overdue", progress: 100 });
       } else {
-        const days = Math.floor(remaining / 24);
-        const hours = Math.floor(remaining % 24);
-        const minutes = Math.floor((remaining % 1) * 60);
+        const remainingHours = remaining / (1000 * 60 * 60);
+        const days = Math.floor(remainingHours / 24);
+        const hours = Math.floor(remainingHours % 24);
+        const minutes = Math.floor((remainingHours % 1) * 60);
 
         let text;
         if (days > 0) {
@@ -117,7 +166,6 @@ const TaskCountdown = ({
   }
 
   // --- ACTIVE ---
-  // Color changes based on how much time has elapsed
   const barColor = progress >= 80
     ? "bg-red-500"
     : progress >= 50
