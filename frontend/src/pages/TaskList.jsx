@@ -99,23 +99,7 @@ const TaskCard = ({
         status={task.status}
       />
 
-      {task.estimatedHours > 0 && task.status !== 'DONE' && (
-        <div className="mt-3 flex flex-col gap-1 text-[11px] font-medium text-slate-500 dark:text-brandMuted">
-          <div className="flex justify-between px-1">
-            <span>Estimated: {task.estimatedHours}h</span>
-            <span>Completed: {task.completedHours || 0}h</span>
-            <span>Remaining: {Math.max(0, task.estimatedHours - (task.completedHours || 0))}h</span>
-          </div>
-          {Math.max(0, task.estimatedHours - (task.completedHours || 0)) === 0 && (
-            <div
-              className="mt-1 bg-success/10 text-success border border-success/20 rounded p-1.5 text-center font-bold flex items-center justify-center gap-1 cursor-pointer hover:bg-success/20 transition-colors"
-              onClick={(e) => { e.stopPropagation(); onStatusChange(task.id, 'DONE'); }}
-            >
-              <CheckCircle size={12} /> Ready to Complete
-            </div>
-          )}
-        </div>
-      )}
+
 
 
     </div>
