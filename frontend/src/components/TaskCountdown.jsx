@@ -31,12 +31,20 @@ const TaskCountdown = ({
   const [remainSecs, setRemainSecs] = useState(calculateRemainSecs());
 
   useEffect(() => {
-    if (status === "DONE" || remainSecs <= 0) return;
+    setRemainSecs(calculateRemainSecs());
+    
+    if (status === "DONE") return;
+    
     const interval = setInterval(() => {
-      setRemainSecs(calculateRemainSecs());
+      const current = calculateRemainSecs();
+      setRemainSecs(current);
+      if (current <= 0) {
+        clearInterval(interval);
+      }
     }, 1000);
+    
     return () => clearInterval(interval);
-  }, [status, est, createdAt]);
+  }, [status, est, createdAt, updatedAt, dueDate]);
 
   if (status === "DONE") {
     return (
@@ -77,15 +85,7 @@ const TaskCountdown = ({
   let Icon = Clock;
   let animatePulse = false;
 
-  if (est > 0 && remainSecs <= 0) {
-    colorBase = "text-red-500";
-    badgeColor = "bg-red-500 text-white border border-red-500";
-    barColor = "bg-red-500";
-    statusText = "TIME UP";
-    Icon = AlertTriangle;
-    text = "0h 0m 0s";
-    animatePulse = true;
-  } else if (progress >= 50 && est > 0) {
+  if (progress >= 50 && est > 0) {
     colorBase = "text-orange-400";
     badgeColor = "bg-orange-500/20 text-orange-400 border border-orange-500/30";
     barColor = "bg-orange-400";
