@@ -110,7 +110,6 @@ const TaskFormModal = ({ isOpen, onClose, onSave, taskToEdit }) => {
           .replace(/\\n/g, '\n'),
         estimatedTime: formData.estimatedHours ? `${formData.estimatedHours} Hours` : null,
         estimatedHours: formData.estimatedHours ? parseInt(formData.estimatedHours) : null,
-        category: formData.category || 'Development',
         dueDate: finalDueDate
       };
 
@@ -372,21 +371,6 @@ const TaskFormModal = ({ isOpen, onClose, onSave, taskToEdit }) => {
                 </div>
               </div>
 
-              <div className="space-y-3 relative">
-                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                  <Tag size={16} className="text-slate-400" /> Category
-                </label>
-                <div className="relative group">
-                  <select name="category" value={formData.category || 'Development'} onChange={handleChange} className="premium-input appearance-none cursor-pointer">
-                    <option value="Development">Development</option>
-                    <option value="Design">Design</option>
-                    <option value="Marketing">Marketing</option>
-                    <option value="Research">Research</option>
-                    <option value="Bug Fix">Bug Fix</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-              </div>
             </div>
           </form>
 

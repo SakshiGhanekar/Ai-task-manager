@@ -86,12 +86,6 @@ const TaskCountdown = ({
           <Timer size={11} className="text-primary-500" />
           EST: {est}h
         </div>
-        {category && (
-          <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">
-            <Tag size={11} className="text-accent-500" />
-            {category}
-          </div>
-        )}
       </div>
 
       <div className="flex items-center justify-between mb-2">
