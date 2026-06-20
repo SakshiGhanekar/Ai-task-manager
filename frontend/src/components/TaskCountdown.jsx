@@ -52,8 +52,8 @@ const TaskCountdown = ({
 
       if (diff <= 0) {
         setTaskState({
-          status: "OVERDUE",
-          text: "Time Overdue",
+          status: "ACTIVE",
+          text: "0m Left",
           progress: 100,
         });
         return;
@@ -99,20 +99,6 @@ const TaskCountdown = ({
 
         <span className="px-2 py-1 rounded bg-green-500 text-white text-[10px] font-bold">
           DONE
-        </span>
-      </div>
-    );
-  }
-
-  if (taskState.status === "OVERDUE") {
-    return (
-      <div className="mt-3 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-red-500 text-xs font-bold">
-          <AlertTriangle size={13} />
-          Time Up
-        </div>
-        <span className="px-2 py-1 rounded bg-red-500 text-white text-[10px] font-bold">
-          OVERDUE
         </span>
       </div>
     );
