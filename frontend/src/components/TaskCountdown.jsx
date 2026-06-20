@@ -80,13 +80,6 @@ const TaskCountdown = ({
 
   return (
     <div className="mt-3">
-      {/* Category and Est Time Display */}
-      <div className="flex items-center gap-3 mb-3 pb-2 border-b border-slate-200 dark:border-white/5">
-        <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-400">
-          <Timer size={11} className="text-primary-500" />
-          EST: {est}h
-        </div>
-      </div>
 
       <div className="flex items-center justify-between mb-2">
         <div className={`flex items-center gap-2 text-xs font-bold ${colorBase}`}>
