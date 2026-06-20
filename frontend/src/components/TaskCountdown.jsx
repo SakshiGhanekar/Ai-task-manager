@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { Clock, AlertTriangle, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -36,6 +36,7 @@ const TaskCountdown = ({
       }
 
       const diff = due - now;
+
       let progress = 0;
 
       if (createdAt) {
@@ -63,12 +64,13 @@ const TaskCountdown = ({
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 
       let text = "";
+
       if (days > 0) {
-        text = `${days}d ${hours}h Left`;
+        text = `d h Left`;
       } else if (hours > 0) {
-        text = `${hours}h ${minutes}m Left`;
+        text = `h m Left`;
       } else {
-        text = `${minutes}m Left`;
+        text = `m Left`;
       }
 
       setTaskState({
@@ -79,7 +81,9 @@ const TaskCountdown = ({
     };
 
     updateCountdown();
+
     const interval = setInterval(updateCountdown, 1000);
+
     return () => clearInterval(interval);
   }, [createdAt, dueDate, status]);
 
@@ -92,6 +96,7 @@ const TaskCountdown = ({
           <CheckCircle size={13} />
           Task Completed
         </div>
+
         <span className="px-2 py-1 rounded bg-green-500 text-white text-[10px] font-bold">
           DONE
         </span>
@@ -107,10 +112,12 @@ const TaskCountdown = ({
             <AlertTriangle size={13} />
             Time Overdue
           </div>
+
           <span className="px-2 py-1 rounded bg-red-500 text-white text-[10px] font-bold">
             OVERDUE
           </span>
         </div>
+
         <div className="w-full bg-slate-800 h-1.5 rounded">
           <div className="bg-red-500 h-full w-full rounded" />
         </div>
@@ -125,15 +132,17 @@ const TaskCountdown = ({
           <Clock size={13} />
           {taskState.text}
         </div>
+
         <span className="px-2 py-1 rounded bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] font-bold">
           ACTIVE
         </span>
       </div>
+
       {showProgress && (
         <div className="w-full bg-slate-800 h-1.5 rounded overflow-hidden">
           <motion.div
             animate={{
-              width: `${taskState.progress}%`,
+              width: `%`,
             }}
             transition={{ duration: 0.5 }}
             className="h-full bg-green-400 rounded"
