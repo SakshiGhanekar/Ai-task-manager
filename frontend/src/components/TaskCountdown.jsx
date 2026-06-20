@@ -73,34 +73,32 @@ const TaskCountdown = ({
   const m = Math.floor((remainSecs % 3600) / 60);
   const s = Math.floor(remainSecs % 60);
   
-  let text = "0h 0m 0s";
+  let text = "";
   let hasDeadline = est > 0 || dueDate;
 
   if (hasDeadline) {
     if (remainSecs <= 0) {
-      text = "Expired";
+      text = "Time Completed";
     } else {
       text = `${h}h ${m}m ${s}s`;
     }
   } else {
-    text = "No Time Limit";
+    text = "Ongoing Task";
   }
 
-  let barColor = "bg-green-400";
-  let textColor = "text-slate-500 dark:text-slate-400";
+  // Use a pleasant unified color scheme instead of scary reds
+  let barColor = "bg-primary-500";
+  let textColor = "text-primary-400";
 
-  // Change colors based on progress percentage if there is a deadline
   if (!hasDeadline) {
-    barColor = "bg-slate-500";
+    barColor = "bg-slate-700";
     textColor = "text-slate-400";
-  } else if (progress >= 80 || remainSecs <= 0) {
-    barColor = "bg-red-500";
-    textColor = "text-red-500";
-  } else if (progress >= 40) {
-    barColor = "bg-orange-400";
-    textColor = "text-orange-400";
+  } else if (remainSecs <= 0) {
+    barColor = "bg-green-500";
+    textColor = "text-green-500";
   } else {
-    textColor = "text-green-400";
+    barColor = "bg-primary-500";
+    textColor = "text-primary-400";
   }
 
   // To display the start/updated time in Indian Standard Time (IST)
