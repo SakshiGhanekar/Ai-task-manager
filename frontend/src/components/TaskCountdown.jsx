@@ -78,34 +78,7 @@ const TaskCountdown = ({
     barColor = "bg-orange-400";
   }
 
-  return (
-    <div className="mt-3">
-
-      <div className="flex items-center justify-between mb-2">
-        <div className={`flex items-center gap-2 text-xs font-bold ${colorBase}`}>
-          <motion.div animate={animatePulse ? { scale: [1, 1.2, 1] } : {}} transition={{ repeat: Infinity, duration: 1 }}>
-            <Icon size={13} />
-          </motion.div>
-          <span className="tabular-nums tracking-tight">{text}</span>
-        </div>
-
-        <span className={`px-2 py-1 rounded text-[10px] font-bold ${badgeColor}`}>
-          {statusText}
-        </span>
-      </div>
-
-      {showProgress && (
-        <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden shadow-inner">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 1, ease: "linear" }}
-            className={`h-full rounded-full ${barColor} shadow-[0_0_10px_rgba(0,0,0,0.2)]`}
-          />
-        </div>
-      )}
-    </div>
-  );
+  return null;
 };
 
 export default TaskCountdown;
