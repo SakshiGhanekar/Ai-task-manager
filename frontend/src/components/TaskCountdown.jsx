@@ -1,31 +1,34 @@
 import React, { useState, useEffect } from "react";
-import { Clock, CheckCircle, AlertTriangle, Timer, Activity } from "lucide-react";
+import { Clock, CheckCircle, AlertTriangle, Timer, Tag } from "lucide-react";
 import { motion } from "framer-motion";
 
 const TaskCountdown = ({
+  createdAt,
   estimatedHours,
-  completedHours,
+  category,
   status,
   showProgress = true,
 }) => {
   const est = Number(estimatedHours) || 0;
-  const comp = Number(completedHours) || 0;
-  const initialRemainSecs = Math.max(0, (est - comp) * 3600);
+  
+  // Calculate remaining seconds based on creation time
+  const calculateRemainSecs = () => {
+    if (est <= 0) return 0;
+    const now = Date.now();
+    const created = createdAt ? new Date(createdAt).getTime() : now;
+    const elapsedSecs = Math.max(0, Math.floor((now - created) / 1000));
+    return Math.max(0, est * 3600 - elapsedSecs);
+  };
 
-  const [remainSecs, setRemainSecs] = useState(initialRemainSecs);
-
-  useEffect(() => {
-    // Sync if props change
-    setRemainSecs(Math.max(0, (est - comp) * 3600));
-  }, [est, comp]);
+  const [remainSecs, setRemainSecs] = useState(calculateRemainSecs());
 
   useEffect(() => {
     if (status === "DONE" || remainSecs <= 0) return;
     const interval = setInterval(() => {
-      setRemainSecs(prev => (prev > 0 ? prev - 1 : 0));
+      setRemainSecs(calculateRemainSecs());
     }, 1000);
     return () => clearInterval(interval);
-  }, [status, remainSecs]);
+  }, [status, est, createdAt]);
 
   if (status === "DONE") {
     return (
@@ -77,16 +80,18 @@ const TaskCountdown = ({
 
   return (
     <div className="mt-3">
-      {/* NEW: Show User Input Timings */}
+      {/* Category and Est Time Display */}
       <div className="flex items-center gap-3 mb-3 pb-2 border-b border-slate-200 dark:border-white/5">
         <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-400">
           <Timer size={11} className="text-primary-500" />
           EST: {est}h
         </div>
-        <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-400">
-          <Activity size={11} className="text-accent-500" />
-          COMP: {comp}h
-        </div>
+        {category && (
+          <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">
+            <Tag size={11} className="text-accent-500" />
+            {category}
+          </div>
+        )}
       </div>
 
       <div className="flex items-center justify-between mb-2">

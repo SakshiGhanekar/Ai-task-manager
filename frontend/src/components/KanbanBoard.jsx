@@ -112,9 +112,8 @@ const KanbanBoard = ({ tasks, onStatusChange, onEdit, onDelete }) => {
                     {/* Task Countdown & Progress */}
                     <TaskCountdown 
                       createdAt={task.createdAt}
-                      dueDate={task.dueDate} 
                       estimatedHours={task.estimatedHours}
-                      completedHours={task.completedHours}
+                      category={task.category}
                       status={task.status} 
                     />
 

@@ -21,8 +21,8 @@ const TaskFormModal = ({ isOpen, onClose, onSave, taskToEdit }) => {
     status: 'TODO',
     priority: 'MEDIUM',
     dueDate: '',
-    estimatedHours: '',
-    completedHours: ''
+    estimatedHours: 4,
+    category: 'Development'
   });
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -70,8 +70,8 @@ const TaskFormModal = ({ isOpen, onClose, onSave, taskToEdit }) => {
         status: taskToEdit.status || 'TODO',
         priority: taskToEdit.priority || 'MEDIUM',
         dueDate: formatDueDate(taskToEdit.dueDate),
-        estimatedHours: taskToEdit.estimatedHours ?? parseEstimatedHours(taskToEdit.estimatedTime) ?? '',
-        completedHours: taskToEdit.completedHours ?? ''
+        estimatedHours: taskToEdit.estimatedHours ?? parseEstimatedHours(taskToEdit.estimatedTime) ?? 4,
+        category: taskToEdit.category || 'Development'
       });
       console.log('Opened Edit Modal with task:', taskToEdit);
     } else {
@@ -81,8 +81,8 @@ const TaskFormModal = ({ isOpen, onClose, onSave, taskToEdit }) => {
         status: 'TODO',
         priority: 'MEDIUM',
         dueDate: '',
-        estimatedHours: '',
-        completedHours: ''
+        estimatedHours: 4,
+        category: 'Development'
       });
     }
   }, [taskToEdit, isOpen]);
@@ -110,7 +110,7 @@ const TaskFormModal = ({ isOpen, onClose, onSave, taskToEdit }) => {
           .replace(/\\n/g, '\n'),
         estimatedTime: formData.estimatedHours ? `${formData.estimatedHours} Hours` : null,
         estimatedHours: formData.estimatedHours ? parseInt(formData.estimatedHours) : null,
-        completedHours: formData.completedHours ? parseInt(formData.completedHours) : 0,
+        category: formData.category || 'Development',
         dueDate: finalDueDate
       };
 
@@ -374,10 +374,17 @@ const TaskFormModal = ({ isOpen, onClose, onSave, taskToEdit }) => {
 
               <div className="space-y-3 relative">
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                  <Activity size={16} className="text-slate-400" /> Comp. Hours
+                  <Tag size={16} className="text-slate-400" /> Category
                 </label>
                 <div className="relative group">
-                  <input type="number" name="completedHours" value={formData.completedHours} onChange={handleChange} required min="0" placeholder="e.g. 2" className="premium-input" />
+                  <select name="category" value={formData.category || 'Development'} onChange={handleChange} className="premium-input appearance-none cursor-pointer">
+                    <option value="Development">Development</option>
+                    <option value="Design">Design</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Research">Research</option>
+                    <option value="Bug Fix">Bug Fix</option>
+                    <option value="Other">Other</option>
+                  </select>
                 </div>
               </div>
             </div>
