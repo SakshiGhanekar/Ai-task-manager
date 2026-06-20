@@ -132,21 +132,10 @@ const TaskFormModal = ({ isOpen, onClose, onSave, taskToEdit }) => {
         dueDate: finalDueDate
       };
 
-      // Try real backend first; fall back to localStorage via context
-      try {
-        if (taskToEdit) {
-          await api.put(`tasks/${taskToEdit.id}`, taskData);
-        } else {
-          await api.post('tasks', taskData);
-        }
-      } catch (apiError) {
-        // Backend unreachable — save locally using TaskContext (localStorage)
-        console.warn('Backend unavailable, saving to localStorage:', apiError.message);
-        if (taskToEdit) {
-          await updateTask(taskToEdit.id, { ...taskData, id: taskToEdit.id });
-        } else {
-          await createTask(taskData);
-        }
+      if (taskToEdit) {
+        await updateTask(taskToEdit.id, taskData);
+      } else {
+        await createTask(taskData);
       }
       onSave();
     } catch (error) {
