@@ -27,7 +27,6 @@ const TaskCountdown = ({
     const updateCountdown = () => {
       const now = Date.now();
       
-      // Determine the target date string (YYYY-MM-DD)
       let targetDateStr = null;
       let startMs = null;
 
@@ -35,10 +34,26 @@ const TaskCountdown = ({
       const extractDateStr = (dateInput) => {
         if (!dateInput) return null;
         if (Array.isArray(dateInput)) {
-          return `${dateInput[0]}-${String(dateInput[1]).padStart(2, '0')}-${String(dateInput[2]).padStart(2, '0')}`;
+          // It's a java array [Y, M, D, h, m, s]
+          if (dateInput.length <= 3) {
+            return `${dateInput[0]}-${String(dateInput[1]).padStart(2, '0')}-${String(dateInput[2]).padStart(2, '0')}`;
+          }
+          // Convert array to UTC Date, then extract local YYYY-MM-DD
+          const dObj = new Date(Date.UTC(dateInput[0], dateInput[1] - 1, dateInput[2], dateInput[3] || 0, dateInput[4] || 0, dateInput[5] || 0));
+          return `${dObj.getFullYear()}-${String(dObj.getMonth() + 1).padStart(2, '0')}-${String(dObj.getDate()).padStart(2, '0')}`;
         }
         if (typeof dateInput === 'string') {
-          return dateInput.substring(0, 10);
+          // If it's just "YYYY-MM-DD", use it directly
+          if (dateInput.length === 10) return dateInput;
+
+          let s = dateInput;
+          if (s.includes("T") && !s.endsWith("Z") && !s.includes("+") && !s.includes("-", 10)) {
+            s += "Z";
+          }
+          const d = new Date(s);
+          if (isNaN(d.getTime())) return dateInput.substring(0, 10);
+          
+          return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         }
         if (typeof dateInput === 'number') {
           const d = new Date(dateInput);
@@ -55,7 +70,7 @@ const TaskCountdown = ({
         return;
       }
 
-      // End of that day (23:59:59) in local time
+      // End of that target day (23:59:59) in local time
       const endOfDay = new Date(`${targetDateStr}T23:59:59`);
       const deadlineMs = endOfDay.getTime();
 
@@ -66,17 +81,21 @@ const TaskCountdown = ({
 
       // Determine start time for progress bar calculation
       if (createdAt) {
-        let startStr = createdAt;
-        if (Array.isArray(startStr)) {
-          const [y, m, d, h = 0, min = 0, s = 0] = startStr;
-          startMs = new Date(y, m - 1, d, h, min, s).getTime();
-        } else if (typeof startStr === 'string') {
-          if (startStr.includes("T") && !startStr.endsWith("Z") && !startStr.includes("+") && !startStr.includes("-", 10)) {
-            startStr += "Z";
+        if (Array.isArray(createdAt)) {
+          const [y, m, d, h = 0, min = 0, s = 0] = createdAt;
+          if (createdAt.length <= 3) {
+            startMs = new Date(y, m - 1, d).getTime();
+          } else {
+            startMs = new Date(Date.UTC(y, m - 1, d, h, min, s)).getTime();
           }
-          startMs = new Date(startStr).getTime();
-        } else if (typeof startStr === 'number') {
-          startMs = new Date(startStr).getTime();
+        } else if (typeof createdAt === 'string') {
+          let s = createdAt;
+          if (s.includes("T") && !s.endsWith("Z") && !s.includes("+") && !s.includes("-", 10)) {
+            s += "Z";
+          }
+          startMs = new Date(s).getTime();
+        } else if (typeof createdAt === 'number') {
+          startMs = new Date(createdAt).getTime();
         }
       }
       
