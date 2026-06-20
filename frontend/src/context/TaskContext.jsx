@@ -25,7 +25,7 @@ export const TaskProvider = ({ children }) => {
           t.createdAt = new Date().toISOString();
           modified = true;
         }
-        
+
         // MIGRATION: Fix old tasks that have missing dueDate, or dueDate without time (YYYY-MM-DD),
         // which causes them to be instantly overdue at 00:00 UTC.
         if (!t.dueDate || (typeof t.dueDate === 'string' && t.dueDate.length === 10)) {
@@ -73,8 +73,20 @@ export const TaskProvider = ({ children }) => {
 
   const createTask = async (taskData) => {
     let savedTasks = JSON.parse(localStorage.getItem('mockTasks') || '[]');
-    const now = new Date().toISOString();
-    const newTask = { ...taskData, id: Date.now(), createdAt: now, updatedAt: now };
+    const now = new Date();
+
+    const estimatedHours = Number(taskData.estimatedHours || 1);
+
+    const dueDateTime = new Date(
+      Date.now() + estimatedHours * 60 * 60 * 1000
+    );
+
+    const newTask = {
+      ...taskData,
+      id: Date.now(),
+      createdAt: new Date().toISOString(),
+      dueDate: dueDateTime.toISOString(),
+    };
     savedTasks.unshift(newTask);
     localStorage.setItem('mockTasks', JSON.stringify(savedTasks));
     await fetchTasks();
