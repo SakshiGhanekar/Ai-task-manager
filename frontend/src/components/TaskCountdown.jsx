@@ -1,5 +1,5 @@
 import React from "react";
-import { Clock, CheckCircle } from "lucide-react";
+import { Clock, CheckCircle, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
 
 const TaskCountdown = ({
@@ -33,16 +33,35 @@ const TaskCountdown = ({
     text = `${remain}h Left`;
   }
 
+  let colorBase = "text-green-400";
+  let badgeColor = "bg-green-500/20 text-green-400 border border-green-500/30";
+  let barColor = "bg-green-400";
+  let statusText = "ACTIVE";
+  let Icon = Clock;
+
+  if (est > 0 && remain <= 0) {
+    colorBase = "text-red-500";
+    badgeColor = "bg-red-500 text-white border border-red-500";
+    barColor = "bg-red-500";
+    statusText = "OVERDUE";
+    Icon = AlertTriangle;
+    text = "Time Up";
+  } else if (progress >= 50 && est > 0) {
+    colorBase = "text-orange-400";
+    badgeColor = "bg-orange-500/20 text-orange-400 border border-orange-500/30";
+    barColor = "bg-orange-400";
+  }
+
   return (
     <div className="mt-3">
       <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2 text-green-400 text-xs font-bold">
-          <Clock size={13} />
+        <div className={`flex items-center gap-2 text-xs font-bold ${colorBase}`}>
+          <Icon size={13} />
           {text}
         </div>
 
-        <span className="px-2 py-1 rounded bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] font-bold">
-          ACTIVE
+        <span className={`px-2 py-1 rounded text-[10px] font-bold ${badgeColor}`}>
+          {statusText}
         </span>
       </div>
 
@@ -52,7 +71,7 @@ const TaskCountdown = ({
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.5 }}
-            className="h-full bg-green-400 rounded"
+            className={`h-full rounded ${barColor}`}
           />
         </div>
       )}
