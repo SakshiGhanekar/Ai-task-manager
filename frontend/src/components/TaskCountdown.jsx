@@ -1,5 +1,5 @@
-import React from "react";
-import { Clock, CheckCircle, AlertTriangle } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Clock, CheckCircle, AlertTriangle, Timer, Activity } from "lucide-react";
 import { motion } from "framer-motion";
 
 const TaskCountdown = ({
@@ -8,6 +8,25 @@ const TaskCountdown = ({
   status,
   showProgress = true,
 }) => {
+  const est = Number(estimatedHours) || 0;
+  const comp = Number(completedHours) || 0;
+  const initialRemainSecs = Math.max(0, (est - comp) * 3600);
+
+  const [remainSecs, setRemainSecs] = useState(initialRemainSecs);
+
+  useEffect(() => {
+    // Sync if props change
+    setRemainSecs(Math.max(0, (est - comp) * 3600));
+  }, [est, comp]);
+
+  useEffect(() => {
+    if (status === "DONE" || remainSecs <= 0) return;
+    const interval = setInterval(() => {
+      setRemainSecs(prev => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [status, remainSecs]);
+
   if (status === "DONE") {
     return (
       <div className="mt-3 flex items-center justify-between">
@@ -15,7 +34,6 @@ const TaskCountdown = ({
           <CheckCircle size={13} />
           Task Completed
         </div>
-
         <span className="px-2 py-1 rounded bg-green-500 text-white text-[10px] font-bold">
           DONE
         </span>
@@ -23,14 +41,17 @@ const TaskCountdown = ({
     );
   }
 
-  const est = Number(estimatedHours) || 0;
-  const comp = Number(completedHours) || 0;
-  const remain = Math.max(0, est - comp);
-  const progress = est > 0 ? Math.min(100, Math.max(0, (comp / est) * 100)) : 0;
+  const progress = est > 0 
+    ? Math.min(100, Math.max(0, ((est * 3600 - remainSecs) / (est * 3600)) * 100)) 
+    : 0;
+
+  const h = Math.floor(remainSecs / 3600);
+  const m = Math.floor((remainSecs % 3600) / 60);
+  const s = Math.floor(remainSecs % 60);
   
-  let text = "0h Left";
+  let text = "0h 0m 0s";
   if (est > 0) {
-    text = `${remain}h Left`;
+    text = `${h}h ${m}m ${s}s`;
   }
 
   let colorBase = "text-green-400";
@@ -38,14 +59,16 @@ const TaskCountdown = ({
   let barColor = "bg-green-400";
   let statusText = "ACTIVE";
   let Icon = Clock;
+  let animatePulse = false;
 
-  if (est > 0 && remain <= 0) {
+  if (est > 0 && remainSecs <= 0) {
     colorBase = "text-red-500";
     badgeColor = "bg-red-500 text-white border border-red-500";
     barColor = "bg-red-500";
     statusText = "OVERDUE";
     Icon = AlertTriangle;
     text = "Time Up";
+    animatePulse = true;
   } else if (progress >= 50 && est > 0) {
     colorBase = "text-orange-400";
     badgeColor = "bg-orange-500/20 text-orange-400 border border-orange-500/30";
@@ -54,10 +77,24 @@ const TaskCountdown = ({
 
   return (
     <div className="mt-3">
+      {/* NEW: Show User Input Timings */}
+      <div className="flex items-center gap-3 mb-3 pb-2 border-b border-slate-200 dark:border-white/5">
+        <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+          <Timer size={11} className="text-primary-500" />
+          EST: {est}h
+        </div>
+        <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+          <Activity size={11} className="text-accent-500" />
+          COMP: {comp}h
+        </div>
+      </div>
+
       <div className="flex items-center justify-between mb-2">
         <div className={`flex items-center gap-2 text-xs font-bold ${colorBase}`}>
-          <Icon size={13} />
-          {text}
+          <motion.div animate={animatePulse ? { scale: [1, 1.2, 1] } : {}} transition={{ repeat: Infinity, duration: 1 }}>
+            <Icon size={13} />
+          </motion.div>
+          <span className="tabular-nums tracking-tight">{text}</span>
         </div>
 
         <span className={`px-2 py-1 rounded text-[10px] font-bold ${badgeColor}`}>
@@ -66,12 +103,12 @@ const TaskCountdown = ({
       </div>
 
       {showProgress && (
-        <div className="w-full bg-slate-800 h-1.5 rounded overflow-hidden">
+        <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden shadow-inner">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.5 }}
-            className={`h-full rounded ${barColor}`}
+            transition={{ duration: 1, ease: "linear" }}
+            className={`h-full rounded-full ${barColor} shadow-[0_0_10px_rgba(0,0,0,0.2)]`}
           />
         </div>
       )}
