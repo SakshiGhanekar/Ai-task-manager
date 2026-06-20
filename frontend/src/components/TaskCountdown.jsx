@@ -12,11 +12,21 @@ const TaskCountdown = ({
 }) => {
   const est = Number(estimatedHours) || 0;
   
+  // Helper to parse server timestamps as local time (removes forced UTC 'Z')
+  const parseLocal = (val) => {
+    if (!val) return null;
+    let s = String(val);
+    if (s.endsWith('Z')) s = s.slice(0, -1);
+    const d = new Date(s);
+    return isNaN(d.getTime()) ? null : d.getTime();
+  };
+
   const getTargetTime = () => {
-    const baseTime = updatedAt ? new Date(updatedAt).getTime() : (createdAt ? new Date(createdAt).getTime() : Date.now());
+    const baseTime = parseLocal(updatedAt) || parseLocal(createdAt) || Date.now();
     const dynamicTarget = baseTime + (est > 0 ? est * 3600000 : 0);
     if (dueDate) {
-      return Math.max(new Date(dueDate).getTime(), dynamicTarget);
+      const parsedDue = parseLocal(dueDate);
+      if (parsedDue) return Math.max(parsedDue, dynamicTarget);
     }
     return dynamicTarget;
   };
@@ -62,7 +72,7 @@ const TaskCountdown = ({
 
   const now = Date.now();
   const targetTime = getTargetTime();
-  const createdTime = createdAt ? new Date(createdAt).getTime() : targetTime - (est > 0 ? est * 3600000 : 3600000);
+  const createdTime = parseLocal(createdAt) || (targetTime - (est > 0 ? est * 3600000 : 3600000));
   
   const totalSecs = Math.floor((targetTime - createdTime) / 1000);
   const progress = totalSecs > 0 
@@ -103,7 +113,7 @@ const TaskCountdown = ({
 
   // To display the start/updated time in Indian Standard Time (IST)
   const getStartTimeIST = () => {
-    const base = updatedAt ? new Date(updatedAt).getTime() : (createdAt ? new Date(createdAt).getTime() : Date.now());
+    const base = parseLocal(updatedAt) || parseLocal(createdAt) || Date.now();
     return new Date(base).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "short", timeStyle: "short" });
   };
 
