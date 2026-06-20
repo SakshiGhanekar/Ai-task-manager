@@ -20,10 +20,23 @@ export const TaskProvider = ({ children }) => {
       // Repair any tasks that are missing createdAt (corrupted by old bug)
       let repaired = false;
       savedTasks = savedTasks.map(t => {
+        let modified = false;
         if (!t.createdAt) {
-          repaired = true;
-          return { ...t, createdAt: new Date().toISOString() };
+          t.createdAt = new Date().toISOString();
+          modified = true;
         }
+        
+        // MIGRATION: Fix old tasks that have missing dueDate, or dueDate without time (YYYY-MM-DD),
+        // which causes them to be instantly overdue at 00:00 UTC.
+        if (!t.dueDate || (typeof t.dueDate === 'string' && t.dueDate.length === 10)) {
+          // Regenerate the due date correctly based on when it was created + estimated hours
+          const start = new Date(t.createdAt).getTime();
+          const hours = t.estimatedHours ? parseInt(t.estimatedHours) : 2; // default 2 hours
+          t.dueDate = new Date(start + hours * 3600000).toISOString();
+          modified = true;
+        }
+
+        if (modified) repaired = true;
         return t;
       });
       if (repaired) {
