@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 const TaskCountdown = ({
   createdAt,
   dueDate,
-  estimatedHours = 0,
   status,
   showProgress = true,
 }) => {
@@ -37,22 +36,16 @@ const TaskCountdown = ({
       }
 
       const diff = due - now;
-
       let progress = 0;
 
       if (createdAt) {
         const created = new Date(createdAt).getTime();
-
         const totalDuration = due - created;
-
         const elapsed = now - created;
 
         progress =
           totalDuration > 0
-            ? Math.min(
-              100,
-              Math.max(0, (elapsed / totalDuration) * 100)
-            )
+            ? Math.min(100, Math.max(0, (elapsed / totalDuration) * 100))
             : 0;
       }
 
@@ -62,24 +55,14 @@ const TaskCountdown = ({
           text: "Time Overdue",
           progress: 100,
         });
-
         return;
       }
 
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-      const hours = Math.floor(
-        (diff % (1000 * 60 * 60 * 24)) /
-        (1000 * 60 * 60)
-      );
-
-      const minutes = Math.floor(
-        (diff % (1000 * 60 * 60)) /
-        (1000 * 60)
-      );
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 
       let text = "";
-
       if (days > 0) {
         text = `${days}d ${hours}h Left`;
       } else if (hours > 0) {
@@ -96,9 +79,7 @@ const TaskCountdown = ({
     };
 
     updateCountdown();
-
     const interval = setInterval(updateCountdown, 1000);
-
     return () => clearInterval(interval);
   }, [createdAt, dueDate, status]);
 
@@ -111,7 +92,6 @@ const TaskCountdown = ({
           <CheckCircle size={13} />
           Task Completed
         </div>
-
         <span className="px-2 py-1 rounded bg-green-500 text-white text-[10px] font-bold">
           DONE
         </span>
@@ -127,12 +107,10 @@ const TaskCountdown = ({
             <AlertTriangle size={13} />
             Time Overdue
           </div>
-
           <span className="px-2 py-1 rounded bg-red-500 text-white text-[10px] font-bold">
             OVERDUE
           </span>
         </div>
-
         <div className="w-full bg-slate-800 h-1.5 rounded">
           <div className="bg-red-500 h-full w-full rounded" />
         </div>
@@ -147,12 +125,10 @@ const TaskCountdown = ({
           <Clock size={13} />
           {taskState.text}
         </div>
-
         <span className="px-2 py-1 rounded bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] font-bold">
           ACTIVE
         </span>
       </div>
-
       {showProgress && (
         <div className="w-full bg-slate-800 h-1.5 rounded overflow-hidden">
           <motion.div

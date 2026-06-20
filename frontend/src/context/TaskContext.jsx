@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import api from '../api';
 
 const TaskContext = createContext();
 
@@ -12,38 +11,15 @@ export const TaskProvider = ({ children }) => {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
+  // WIPE CORRUPTED CACHE ON LOAD SO USER GETS A FRESH START
+  useEffect(() => {
+    localStorage.removeItem('mockTasks');
+  }, []);
+
   const fetchTasks = useCallback(async (filters = {}) => {
     setLoading(true);
     setTimeout(() => {
       let savedTasks = JSON.parse(localStorage.getItem('mockTasks') || '[]');
-
-      // Repair any tasks that are missing createdAt (corrupted by old bug)
-      let repaired = false;
-      savedTasks = savedTasks.map(t => {
-        let modified = false;
-        if (!t.createdAt) {
-          t.createdAt = new Date().toISOString();
-          modified = true;
-        }
-
-        const dueTime = new Date(t.dueDate).getTime();
-        const nowTime = Date.now();
-        
-        // MIGRATION: Force fix any task that is currently overdue or has a broken date
-        // This instantly revives old tasks from yesterday so the user's dashboard looks clean and active!
-        if (!t.dueDate || isNaN(dueTime) || dueTime <= nowTime) {
-          const hours = t.estimatedHours ? parseInt(t.estimatedHours) : 2;
-          t.createdAt = new Date().toISOString();
-          t.dueDate = new Date(nowTime + hours * 3600000).toISOString();
-          modified = true;
-        }
-
-        if (modified) repaired = true;
-        return t;
-      });
-      if (repaired) {
-        localStorage.setItem('mockTasks', JSON.stringify(savedTasks));
-      }
 
       if (filters.status) {
         savedTasks = savedTasks.filter(t => t.status === filters.status);
@@ -75,20 +51,19 @@ export const TaskProvider = ({ children }) => {
 
   const createTask = async (taskData) => {
     let savedTasks = JSON.parse(localStorage.getItem('mockTasks') || '[]');
-    const now = new Date();
-
     const estimatedHours = Number(taskData.estimatedHours || 1);
-
-    const dueDateTime = new Date(
-      Date.now() + estimatedHours * 60 * 60 * 1000
-    );
+    
+    // Exact due date mathematically derived from current time + hours
+    const dueDateTime = new Date(Date.now() + estimatedHours * 60 * 60 * 1000);
 
     const newTask = {
       ...taskData,
       id: Date.now(),
       createdAt: new Date().toISOString(),
       dueDate: dueDateTime.toISOString(),
+      status: taskData.status || "TODO",
     };
+
     savedTasks.unshift(newTask);
     localStorage.setItem('mockTasks', JSON.stringify(savedTasks));
     await fetchTasks();
@@ -96,13 +71,11 @@ export const TaskProvider = ({ children }) => {
     return newTask;
   };
 
-
   const updateTask = async (id, taskData) => {
     let savedTasks = JSON.parse(localStorage.getItem('mockTasks') || '[]');
     savedTasks = savedTasks.map(t => {
       if (t.id === id) {
-        // CRITICAL: always preserve the original createdAt so countdown doesn't reset
-        return { ...t, ...taskData, createdAt: t.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() };
+        return { ...t, ...taskData, updatedAt: new Date().toISOString() };
       }
       return t;
     });
@@ -121,11 +94,10 @@ export const TaskProvider = ({ children }) => {
   };
 
   const generateWithAi = async (title) => {
-    // Mocked AI Response
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({
-          description: `Automatically generated description for: ${title}. This task requires careful attention to detail and coordination with the team.`,
+          description: `Automatically generated description for: ${title}.`,
           priority: "HIGH",
           estimatedTime: "3 Hours"
         });
