@@ -88,7 +88,22 @@ const TaskFormModal = ({ isOpen, onClose, onSave, taskToEdit }) => {
   }, [taskToEdit, isOpen]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    const newFormData = { ...formData, [name]: value };
+    
+    // Auto-update dueDate field when estimatedHours is changed
+    if (name === "estimatedHours") {
+      const hours = parseInt(value) || 0;
+      if (hours > 0) {
+        const d = new Date(Date.now() + hours * 3600000);
+        // format to YYYY-MM-DDThh:mm for the datetime-local input
+        const pad = (n) => n.toString().padStart(2, '0');
+        const formattedDate = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        newFormData.dueDate = formattedDate;
+      }
+    }
+    
+    setFormData(newFormData);
   };
 
   const handleSubmit = async (e) => {
