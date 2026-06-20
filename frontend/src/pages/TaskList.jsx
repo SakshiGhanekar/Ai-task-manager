@@ -93,6 +93,7 @@ const TaskCard = ({
       {/* Task Countdown & Progress */}
       <TaskCountdown
         createdAt={task.createdAt}
+        updatedAt={task.updatedAt}
         estimatedHours={task.estimatedHours}
         dueDate={task.dueDate}
         category={task.category}

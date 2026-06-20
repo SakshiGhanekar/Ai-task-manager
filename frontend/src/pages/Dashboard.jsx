@@ -394,6 +394,7 @@ const Dashboard = () => {
                   <div className="mt-1">
                     <TaskCountdown 
                       createdAt={task.createdAt}
+                      updatedAt={task.updatedAt}
                       estimatedHours={task.estimatedHours}
                       dueDate={task.dueDate}
                       status={task.status} 

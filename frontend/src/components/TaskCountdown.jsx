@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 
 const TaskCountdown = ({
   createdAt,
+  updatedAt,
   estimatedHours,
   dueDate,
   status,
@@ -11,19 +12,18 @@ const TaskCountdown = ({
 }) => {
   const est = Number(estimatedHours) || 0;
   
-  // Calculate remaining seconds based on due date if available
+  const getTargetTime = () => {
+    const baseTime = updatedAt ? new Date(updatedAt).getTime() : (createdAt ? new Date(createdAt).getTime() : Date.now());
+    const dynamicTarget = baseTime + (est > 0 ? est * 3600000 : 0);
+    if (dueDate) {
+      return Math.max(new Date(dueDate).getTime(), dynamicTarget);
+    }
+    return dynamicTarget;
+  };
+
   const calculateRemainSecs = () => {
     const now = Date.now();
-    let targetTime;
-    
-    if (dueDate) {
-      targetTime = new Date(dueDate).getTime();
-    } else {
-      if (est <= 0) return 0;
-      const created = createdAt ? new Date(createdAt).getTime() : now;
-      targetTime = created + (est * 3600000);
-    }
-    
+    const targetTime = getTargetTime();
     const diffSecs = Math.floor((targetTime - now) / 1000);
     return Math.max(0, diffSecs);
   };
@@ -53,15 +53,8 @@ const TaskCountdown = ({
   }
 
   const now = Date.now();
-  let targetTime;
-  let createdTime;
-  if (dueDate) {
-    targetTime = new Date(dueDate).getTime();
-    createdTime = createdAt ? new Date(createdAt).getTime() : targetTime - (est > 0 ? est * 3600000 : 3600000);
-  } else {
-    createdTime = createdAt ? new Date(createdAt).getTime() : now;
-    targetTime = createdTime + (est > 0 ? est * 3600000 : 3600000);
-  }
+  const targetTime = getTargetTime();
+  const createdTime = createdAt ? new Date(createdAt).getTime() : targetTime - (est > 0 ? est * 3600000 : 3600000);
   
   const totalSecs = Math.floor((targetTime - createdTime) / 1000);
   const progress = totalSecs > 0 
@@ -100,15 +93,9 @@ const TaskCountdown = ({
 
   // To display the due time in Indian Standard Time (IST)
   const getDueTimeIST = () => {
-    let targetTime;
-    if (dueDate) {
-      targetTime = new Date(dueDate);
-    } else {
-      if (est <= 0) return null;
-      const created = createdAt ? new Date(createdAt).getTime() : Date.now();
-      targetTime = new Date(created + est * 3600000);
-    }
-    return targetTime.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "short", timeStyle: "short" });
+    const target = getTargetTime();
+    if (!target) return null;
+    return new Date(target).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "short", timeStyle: "short" });
   };
 
   const dueIST = getDueTimeIST();
