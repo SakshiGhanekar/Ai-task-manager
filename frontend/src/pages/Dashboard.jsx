@@ -129,21 +129,47 @@ const Dashboard = () => {
     return 'Good Evening 🌙';
   };
 
-  const weeklyData = [
-    { name: 'Mon', completed: 4, added: 2 },
-    { name: 'Tue', completed: 3, added: 5 },
-    { name: 'Wed', completed: 7, added: 3 },
-    { name: 'Thu', completed: 2, added: 1 },
-    { name: 'Fri', completed: 6, added: 4 },
-    { name: 'Sat', completed: 8, added: 2 },
-    { name: 'Sun', completed: 5, added: 1 },
-  ];
+  const generateWeeklyData = () => {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const result = [];
+    const now = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(now.getDate() - i);
+      const dayName = days[d.getDay()];
+      
+      const added = tasks.filter(t => {
+        const addedDate = t.createdAt ? new Date(t.createdAt) : new Date();
+        return addedDate.toDateString() === d.toDateString();
+      }).length;
+      
+      const completed = tasks.filter(t => {
+        if (t.status !== 'DONE') return false;
+        const updatedDate = t.updatedAt ? new Date(t.updatedAt) : new Date();
+        return updatedDate.toDateString() === d.toDateString();
+      }).length;
+      
+      result.push({ name: dayName, completed, added });
+    }
+    return result;
+  };
+  const weeklyData = generateWeeklyData();
 
-  const priorityData = [
-    { name: 'High', value: stats.highPriorityTasks || 5 },
-    { name: 'Medium', value: (stats.totalTasks - stats.highPriorityTasks - 2) || 8 },
-    { name: 'Low', value: 2 },
-  ];
+  const calculatePriorityData = () => {
+    if (stats.totalTasks === 0) {
+      return [{ name: 'No Tasks', value: 1 }];
+    }
+    const high = stats.highPriorityTasks || 0;
+    const medium = tasks.length > 0 ? tasks.filter(t => t.priority === 'MEDIUM').length : Math.floor((stats.totalTasks - high) * 0.7);
+    const low = tasks.length > 0 ? tasks.filter(t => t.priority === 'LOW').length : Math.max(0, stats.totalTasks - high - medium);
+    
+    return [
+      { name: 'High', value: high },
+      { name: 'Medium', value: medium },
+      { name: 'Low', value: low },
+    ];
+  };
+  const priorityData = calculatePriorityData();
 
   const upcomingTasks = tasks
     .filter(t => t.status !== 'DONE' && t.dueDate)
@@ -323,7 +349,7 @@ const Dashboard = () => {
                   cornerRadius={8}
                 >
                   {priorityData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell key={`cell-${index}`} fill={entry.name === 'No Tasks' ? '#334155' : COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip 
