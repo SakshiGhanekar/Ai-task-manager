@@ -11,11 +11,6 @@ export const TaskProvider = ({ children }) => {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-  // WIPE CORRUPTED CACHE ON LOAD SO USER GETS A FRESH START
-  useEffect(() => {
-    localStorage.removeItem('mockTasks');
-  }, []);
-
   const fetchTasks = useCallback(async (filters = {}) => {
     setLoading(true);
     setTimeout(() => {
@@ -51,16 +46,12 @@ export const TaskProvider = ({ children }) => {
 
   const createTask = async (taskData) => {
     let savedTasks = JSON.parse(localStorage.getItem('mockTasks') || '[]');
-    const estimatedHours = Number(taskData.estimatedHours || 1);
-    
-    // Exact due date mathematically derived from current time + hours
-    const dueDateTime = new Date(Date.now() + estimatedHours * 60 * 60 * 1000);
 
     const newTask = {
       ...taskData,
       id: Date.now(),
       createdAt: new Date().toISOString(),
-      dueDate: dueDateTime.toISOString(),
+      dueDate: taskData.dueDate || new Date(Date.now() + (taskData.estimatedHours || 1) * 3600000).toISOString(),
       status: taskData.status || "TODO",
     };
 
