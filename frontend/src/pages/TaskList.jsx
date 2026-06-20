@@ -94,6 +94,7 @@ const TaskCard = ({
       <TaskCountdown
         createdAt={task.createdAt}
         estimatedHours={task.estimatedHours}
+        dueDate={task.dueDate}
         category={task.category}
         status={task.status}
       />
