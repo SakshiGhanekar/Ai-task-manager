@@ -74,21 +74,32 @@ const TaskCountdown = ({
   const s = Math.floor(remainSecs % 60);
   
   let text = "0h 0m 0s";
-  if (est > 0) {
-    text = `${h}h ${m}m ${s}s`;
+  let hasDeadline = est > 0 || dueDate;
+
+  if (hasDeadline) {
+    if (remainSecs <= 0) {
+      text = "Expired";
+    } else {
+      text = `${h}h ${m}m ${s}s`;
+    }
+  } else {
+    text = "No Time Limit";
   }
 
   let barColor = "bg-green-400";
   let textColor = "text-slate-500 dark:text-slate-400";
 
-  // Change colors based on progress percentage
-  if (progress >= 80) {
+  // Change colors based on progress percentage if there is a deadline
+  if (!hasDeadline) {
+    barColor = "bg-slate-500";
+    textColor = "text-slate-400";
+  } else if (progress >= 80 || remainSecs <= 0) {
     barColor = "bg-red-500";
     textColor = "text-red-500";
   } else if (progress >= 40) {
     barColor = "bg-orange-400";
     textColor = "text-orange-400";
-  } else if (est > 0) {
+  } else {
     textColor = "text-green-400";
   }
 
