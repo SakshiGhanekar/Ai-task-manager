@@ -25,11 +25,15 @@ const TaskCountdown = ({
     }
 
     // Need createdAt + estimatedHours to calculate countdown
-    const startStr = createdAt || dueDate;
+    let startStr = createdAt || dueDate;
     if (!startStr || !estimatedHours || estimatedHours <= 0) {
       // No timer data — show nothing
       setTaskState(null);
       return;
+    }
+
+    if (typeof startStr === 'string' && startStr.includes("T") && !startStr.endsWith("Z") && !startStr.includes("+") && !startStr.includes("-", 10)) {
+      startStr += "Z";
     }
 
     const updateCountdown = () => {

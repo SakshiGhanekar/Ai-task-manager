@@ -84,8 +84,11 @@ const Dashboard = () => {
       const overdue = contextTasks.filter(t => {
         if (t.status === 'DONE') return false;
         
-        const startStr = t.createdAt || t.dueDate;
+        let startStr = t.createdAt || t.dueDate;
         if (startStr && t.estimatedHours > 0) {
+          if (typeof startStr === 'string' && startStr.includes("T") && !startStr.endsWith("Z") && !startStr.includes("+") && !startStr.includes("-", 10)) {
+            startStr += "Z";
+          }
           const start = new Date(startStr).getTime();
           const elapsedHours = (nowTime - start) / (1000 * 60 * 60);
           if (t.estimatedHours - elapsedHours <= 0) return true;
